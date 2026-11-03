@@ -3,10 +3,12 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": []
+    "types": [],
+    "rootDirs": ["src", "shared"]
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "shared/**/*.ts"
   ],
   "exclude": [
     "src/**/*.spec.ts"

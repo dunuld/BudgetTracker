@@ -1,0 +1,433 @@
+import { Component, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../core/api.service.js';
+import { formatDate as fmtDate } from '../../core/format.js';
+import type { Category, CategoryInput, Rule, RuleInput, Statement } from '../../../../shared/api-types';
+import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/api-types';
+
+@Component({
+  selector: 'app-settings',
+  standalone: true,
+  imports: [FormsModule],
+  template: `
+    <h2>Einstellungen</h2>
+
+    <div class="tabs">
+      <button class="tab" [class.active]="activeTab() === 'categories'" (click)="activeTab.set('categories')">Kategorien</button>
+      <button class="tab" [class.active]="activeTab() === 'rules'" (click)="activeTab.set('rules')">Regeln</button>
+      <button class="tab" [class.active]="activeTab() === 'statements'" (click)="activeTab.set('statements')">Auszüge</button>
+    </div>
+
+    @if (activeTab() === 'categories') {
+      <div class="tab-content">
+        <div class="form-row">
+          <input #name placeholder="Name" [(ngModel)]="newCatName" class="input" />
+          <input #color type="color" [(ngModel)]="newCatColor" class="color-input" />
+          <select #kind [(ngModel)]="newCatKind" class="input">
+            <option value="expense">Ausgabe</option>
+            <option value="income">Einnahme</option>
+            <option value="transfer">Umbuchung</option>
+          </select>
+          <button class="btn-primary" (click)="addCategory(name, color, kind)">Hinzufügen</button>
+        </div>
+
+        @if (categories().length > 0) {
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Farbe</th>
+                <th>Typ</th>
+                <th>Aktionen</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (cat of categories(); track cat.id) {
+                <tr>
+                  <td>
+                    <span class="color-dot" [style.background]="cat.color"></span>
+                    {{ cat.name }}
+                    @if (cat.isDefault) { <span class="badge">Standard</span> }
+                  </td>
+                  <td><code>{{ cat.color }}</code></td>
+                  <td>{{ kindLabel(cat.kind) }}</td>
+                  <td>
+                    @if (!cat.isDefault) {
+                      <button class="btn-danger" (click)="deleteCategory(cat.id)">Löschen</button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    @if (activeTab() === 'rules') {
+      <div class="tab-content">
+        <button class="btn-secondary" (click)="reapplyRules()" [disabled]="reapplying()">
+          {{ reapplying() ? 'Wende an …' : 'Regeln neu anwenden' }}
+        </button>
+        @if (reapplyMsg()) { <span class="success-msg">{{ reapplyMsg() }}</span> }
+
+        <div class="form-row">
+          <select #ruleCat [(ngModel)]="newRuleCat" class="input">
+            <option disabled value="">Kategorie wählen</option>
+            @for (cat of categories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+          <select #ruleField [(ngModel)]="newRuleField" class="input">
+            <option value="counterparty">Empfänger</option>
+            <option value="purpose">Verwendungszweck</option>
+            <option value="any">Beides</option>
+          </select>
+          <select #ruleMatch [(ngModel)]="newRuleMatch" class="input">
+            <option value="contains">Enthält</option>
+            <option value="regex">Regex</option>
+          </select>
+          <input #rulePattern placeholder="Muster" [(ngModel)]="newRulePattern" class="input" />
+          <button class="btn-primary" (click)="addRule(ruleCat, ruleField, ruleMatch, rulePattern)">Hinzufügen</button>
+        </div>
+
+        @if (rules().length > 0) {
+          <table>
+            <thead>
+              <tr>
+                <th>Kategorie</th>
+                <th>Feld</th>
+                <th>Typ</th>
+                <th>Muster</th>
+                <th>Priorität</th>
+                <th>Aktionen</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (rule of rules(); track rule.id) {
+                <tr>
+                  <td>{{ categoryName(rule.categoryId) }}</td>
+                  <td>{{ fieldLabel(rule.field) }}</td>
+                  <td>{{ rule.matchType }}</td>
+                  <td><code>{{ rule.pattern }}</code></td>
+                  <td>{{ rule.priority }}</td>
+                  <td>
+                    <button class="btn-danger" (click)="deleteRule(rule.id)">Löschen</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    @if (activeTab() === 'statements') {
+      <div class="tab-content">
+        @if (statements().length > 0) {
+          <table>
+            <thead>
+              <tr>
+                <th>Monat</th>
+                <th>IBAN</th>
+                <th>Buchungen</th>
+                <th>Importiert</th>
+                <th>Aktionen</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of statements(); track s.id) {
+                <tr>
+                  <td>{{ monthYearLabel(s.year, s.month) }}</td>
+                  <td><code>{{ s.iban }}</code></td>
+                  <td>{{ s.transactionCount }}</td>
+                  <td>{{ formatDate(s.importedAt) }}</td>
+                  <td>
+                    <button class="btn-danger" (click)="deleteStatement(s.id)">Löschen</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <p class="empty">Noch keine Auszüge importiert.</p>
+        }
+      </div>
+    }
+
+    @if (errorMsg()) {
+      <div class="error-msg">{{ errorMsg() }}</div>
+    }
+  `,
+  styles: `
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    .tab {
+      background: none;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: #666;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+    .tab.active {
+      color: var(--ha-primary-color, #03a9f4);
+      border-bottom-color: var(--ha-primary-color, #03a9f4);
+      font-weight: 600;
+    }
+
+    .tab-content { padding-top: 0.5rem; }
+
+    .form-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .input {
+      padding: 0.4rem 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    .color-input {
+      width: 40px;
+      height: 32px;
+      padding: 2px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--ha-primary-color, #03a9f4);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+      border: none;
+      border-radius: 4px;
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .btn-secondary:disabled { opacity: 0.5; cursor: default; }
+    .btn-danger {
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+    th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid #eee; }
+    th { font-size: 0.85rem; color: #666; font-weight: 600; }
+    code { background: #f5f5f5; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.85rem; }
+
+    .color-dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+    .badge {
+      display: inline-block;
+      background: #e0e0e0;
+      color: #666;
+      font-size: 0.75rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      margin-left: 0.5rem;
+    }
+
+    .success-msg { color: #4caf50; font-size: 0.9rem; margin-left: 0.5rem; }
+    .error-msg { color: #f44336; font-size: 0.9rem; margin-top: 0.5rem; }
+    .empty { color: #888; text-align: center; padding: 2rem; }
+  `,
+})
+export default class SettingsComponent {
+  private readonly api = new ApiService();
+
+  readonly activeTab = signal<'categories' | 'rules' | 'statements'>('categories');
+
+  // Categories
+  readonly categories = signal<Category[]>([]);
+  newCatName = '';
+  newCatColor = '#4caf50';
+  newCatKind: CategoryKind = 'expense';
+
+  // Rules
+  readonly rules = signal<Rule[]>([]);
+  newRuleCat = '';
+  newRuleField: RuleField = 'any';
+  newRuleMatch: RuleMatchType = 'contains';
+  newRulePattern = '';
+
+  // Statements
+  readonly statements = signal<Statement[]>([]);
+
+  // Feedback
+  readonly errorMsg = signal('');
+  readonly reapplying = signal(false);
+  readonly reapplyMsg = signal('');
+
+  constructor() {
+    this.loadCategories();
+    this.loadRules();
+    this.loadStatements();
+  }
+
+  loadCategories() {
+    this.api.listCategories().subscribe({
+      next: (data) => this.categories.set(data),
+      error: () => this.errorMsg.set('Kategorien konnten nicht geladen werden'),
+    });
+  }
+
+  loadRules() {
+    this.api.listRules().subscribe({
+      next: (data) => this.rules.set(data),
+      error: () => this.errorMsg.set('Regeln konnten nicht geladen werden'),
+    });
+  }
+
+  loadStatements() {
+    this.api.listStatements().subscribe({
+      next: (data) => this.statements.set(data),
+      error: () => this.errorMsg.set('Auszüge konnten nicht geladen werden'),
+    });
+  }
+
+  addCategory(nameInput: HTMLInputElement, colorInput: HTMLInputElement, kindInput: HTMLSelectElement) {
+    const name = nameInput.value.trim();
+    if (!name) return;
+    const input: CategoryInput = {
+      name,
+      color: colorInput.value,
+      kind: kindInput.value as CategoryKind,
+    };
+    this.api.createCategory(input).subscribe({
+      next: (cat) => {
+        this.categories.update((cats) => [...cats, cat]);
+        nameInput.value = '';
+      },
+      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Erstellen'),
+    });
+  }
+
+  deleteCategory(id: number) {
+    if (!confirm('Kategorie löschen? Buchungen werden auf „Sonstiges" zurückgesetzt.')) return;
+    this.api.deleteCategory(id).subscribe({
+      next: () => {
+        this.categories.update((cats) => cats.filter((c) => c.id !== id));
+        this.loadRules();
+      },
+      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
+    });
+  }
+
+  addRule(
+    catSelect: HTMLSelectElement,
+    fieldSelect: HTMLSelectElement,
+    matchSelect: HTMLSelectElement,
+    patternInput: HTMLInputElement,
+  ) {
+    const categoryId = Number(catSelect.value);
+    const pattern = patternInput.value.trim();
+    if (!categoryId || !pattern) return;
+    const input: RuleInput = {
+      categoryId,
+      field: fieldSelect.value as RuleField,
+      matchType: matchSelect.value as RuleMatchType,
+      pattern,
+    };
+    this.api.createRule(input).subscribe({
+      next: (rule) => {
+        this.rules.update((rules) => [...rules, rule]);
+        patternInput.value = '';
+      },
+      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Erstellen'),
+    });
+  }
+
+  deleteRule(id: number) {
+    this.api.deleteRule(id).subscribe({
+      next: () => {
+        this.rules.update((rules) => rules.filter((r) => r.id !== id));
+      },
+      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
+    });
+  }
+
+  reapplyRules() {
+    this.reapplying.set(true);
+    this.reapplyMsg.set('');
+    this.api.reapplyRules().subscribe({
+      next: (result) => {
+        this.reapplyMsg.set(`${result.updated} Buchungen aktualisiert`);
+        this.reapplying.set(false);
+      },
+      error: () => {
+        this.errorMsg.set('Regeln konnten nicht angewendet werden');
+        this.reapplying.set(false);
+      },
+    });
+  }
+
+  deleteStatement(id: number) {
+    if (!confirm('Auszug und alle zugehörigen Buchungen löschen?')) return;
+    this.api.deleteStatement(id).subscribe({
+      next: () => {
+        this.statements.update((stmts) => stmts.filter((s) => s.id !== id));
+      },
+      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
+    });
+  }
+
+  categoryName(categoryId: number): string {
+    return this.categories().find((c) => c.id === categoryId)?.name ?? `ID: ${categoryId}`;
+  }
+
+  kindLabel(kind: CategoryKind): string {
+    switch (kind) {
+      case 'expense': return 'Ausgabe';
+      case 'income': return 'Einnahme';
+      case 'transfer': return 'Umbuchung';
+    }
+  }
+
+  fieldLabel(field: RuleField): string {
+    switch (field) {
+      case 'counterparty': return 'Empfänger';
+      case 'purpose': return 'Verwendungszweck';
+      case 'any': return 'Beides';
+    }
+  }
+
+  monthYearLabel(year: number, month: number): string {
+    const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+    return `${months[month - 1]} ${year}`;
+  }
+
+  formatDate(iso: string): string {
+    return fmtDate(iso);
+  }
+}

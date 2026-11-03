@@ -7,9 +7,12 @@
 /bazel-out
 
 # Node
-/node_modules
+node_modules
 npm-debug.log
 yarn-error.log
+
+# Lokale Addon-Daten (SQLite, Uploads)
+/.data
 
 # IDEs and editors
 .idea/
@@ -38,6 +41,9 @@ yarn-error.log
 testem.log
 /typings
 __screenshots__/
+
+# Junie agent sessions and settings
+.junie/
 
 # System files
 .DS_Store

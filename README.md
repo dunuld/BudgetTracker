@@ -1,59 +1,98 @@
-# BudgetTracker
+# Haushaltsbuch – HomeAssistant Addon
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.5.
+Monatlich einen ING-Kontoauszug (PDF) hochladen, Transaktionen automatisch kategorisieren und als Diagramme darstellen. Läuft als HomeAssistant-Addon über Ingress.
 
-## Development server
+[Dokumentation](DOCS.md) · [Changelog](CHANGELOG.md)
 
-To start a local development server, run:
+## Lokale Entwicklung
+
+Voraussetzungen: Node.js ≥ 24, npm.
 
 ```bash
-ng serve
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Frontend + Backend gleichzeitig
 
 ```bash
-ng generate component component-name
+# Terminal 1: Angular Dev-Server (mit API-Proxy zum Backend)
+npm start
+
+# Terminal 2: Express-Backend
+npm run dev:server
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Öffne `http://localhost:4200/`. Der Proxy leitet `/api/*` an `http://localhost:8099` weiter.
+
+### Build
 
 ```bash
-ng generate --help
+# Frontend + Backend bauen
+npm run build:all
+
+# Nur Frontend
+npm run build
+
+# Nur Backend
+npm run build:server
 ```
 
-## Building
-
-To build the project run:
+### Tests
 
 ```bash
-ng build
-```
+# Server-Tests (Vitest)
+npm run test:server
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
+# Angular-Tests
 ng test
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### Docker-Image bauen
 
 ```bash
-ng e2e
+docker build -t budget-tracker .
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Projektstruktur
 
-## Additional Resources
+```
+config.yaml              # HA-Addon-Konfiguration
+Dockerfile               # Multi-Stage Build (node:24-alpine)
+shared/api-types.ts      # Gemeinsame DTOs
+server/                  # Express-Backend (TypeScript)
+  src/main.ts            # Entry Point, Port 8099
+  src/db/                # SQLite-Schema, Seed-Daten
+  src/parsing/           # PDF-Textextraktion, ING-Parser
+  src/categorization/    # Regelbasierte Kategorisierung
+  src/services/          # Import, Reports
+  src/routes/            # REST-API-Endpunkte
+  test/                  # Server-Tests
+src/                     # Angular-Frontend
+  app/core/              # ApiService, Format-Helfer
+  app/features/          # Feature-Komponenten (Upload, Übersicht, etc.)
+  app/shared/            # Chart-Wrapper
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Architektur
+
+```mermaid
+graph LR
+HA[HA Frontend Ingress] --> EX[Express Server :8099]
+EX --> ST[Static Angular Build]
+EX --> API[REST /api]
+API --> IMP[ImportService]
+IMP --> PDF[pdfjs-dist]
+PDF --> ING[IngParser]
+IMP --> CAT[Categorizer]
+API --> REP[ReportService]
+IMP --> DB[(SQLite /data/budget.db)]
+CAT --> DB
+REP --> DB
+```
+
+## Lizenzen
+
+- Angular: MIT
+- Express: MIT
+- pdfjs-dist: Apache-2.0
+- chart.js: MIT

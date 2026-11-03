@@ -1,0 +1,200 @@
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import request from 'supertest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { createApp, ipFilter, normalizeIp } from '../src/app.js';
+import { INGRESS_PROXY_IP, loadConfig } from '../src/config.js';
+import { openDatabase, SCHEMA_VERSION, type Database } from '../src/db/database.js';
+import { DEFAULT_CATEGORY_NAME, SEED_CATEGORIES } from '../src/db/seed.js';
+
+const tempDirs: string[] = [];
+const openDbs: Database[] = [];
+
+function tempDir(): string {
+  const dir = mkdtempSync(join(tmpdir(), 'budget-test-'));
+  tempDirs.push(dir);
+  return dir;
+}
+
+function memoryDb(): Database {
+  const db = openDatabase(':memory:');
+  openDbs.push(db);
+  return db;
+}
+
+afterEach(() => {
+  openDbs.splice(0).forEach((db) => db.isOpen && db.close());
+  tempDirs.splice(0).forEach((dir) => rmSync(dir, { recursive: true, force: true }));
+});
+
+describe('Datenbank', () => {
+  it('legt Schema und Seed-Kategorien inkl. Regeln an', () => {
+    const db = memoryDb();
+    const names = db.prepare('SELECT name FROM categories ORDER BY sort').all().map((r) => r['name']);
+    expect(names).toEqual(SEED_CATEGORIES.map((c) => c.name));
+    expect(names).toContain('Streaming & Abos');
+
+    const ruleCount = Number(db.prepare('SELECT COUNT(*) AS n FROM rules').get()?.['n']);
+    expect(ruleCount).toBe(SEED_CATEGORIES.reduce((sum, c) => sum + c.rules.length, 0));
+
+    const netflix = db
+      .prepare(
+        `SELECT c.name FROM rules r JOIN categories c ON c.id = r.category_id WHERE r.pattern = 'NETFLIX'`,
+      )
+      .get();
+    expect(netflix?.['name']).toBe('Streaming & Abos');
+
+    const defaults = db.prepare('SELECT name FROM categories WHERE is_default = 1').all();
+    expect(defaults).toEqual([{ name: DEFAULT_CATEGORY_NAME }]);
+    expect(db.prepare('PRAGMA user_version').get()?.['user_version']).toBe(SCHEMA_VERSION);
+    expect(db.prepare('PRAGMA foreign_keys').get()?.['foreign_keys']).toBe(1);
+  });
+
+  it('alle Seed-Regex-Muster sind gültig', () => {
+    const db = memoryDb();
+    const patterns = db.prepare(`SELECT pattern FROM rules WHERE match_type = 'regex'`).all();
+    expect(patterns.length).toBeGreaterThan(0);
+    for (const { pattern } of patterns) expect(() => new RegExp(String(pattern), 'i')).not.toThrow();
+    expect(new RegExp(String(patterns.find((p) => p['pattern'] === '\\bESSO\\b')?.['pattern']), 'i').test('Espresso Bar')).toBe(false);
+  });
+
+  it('seedet nur einmal und behält Änderungen bei erneutem Öffnen', () => {
+    const file = join(tempDir(), 'nested', 'budget.db');
+    let db = openDatabase(file);
+    db.prepare(`DELETE FROM categories WHERE name = 'Drogerie'`).run();
+    db.close();
+
+    db = openDatabase(file);
+    openDbs.push(db);
+    const drogerie = db.prepare(`SELECT id FROM categories WHERE name = 'Drogerie'`).get();
+    expect(drogerie).toBeUndefined();
+    expect(Number(db.prepare('SELECT COUNT(*) AS n FROM categories').get()?.['n'])).toBe(
+      SEED_CATEGORIES.length - 1,
+    );
+  });
+
+  it('lehnt ein neueres Schema ab', () => {
+    const file = join(tempDir(), 'budget.db');
+    const db = openDatabase(file);
+    db.exec(`PRAGMA user_version = ${SCHEMA_VERSION + 1}`);
+    db.close();
+    expect(() => openDatabase(file)).toThrow(/neuer/);
+  });
+
+  it('schützt die Standardkategorie und ordnet Buchungen gelöschter Kategorien ihr zu', () => {
+    const db = memoryDb();
+    expect(() => db.prepare('DELETE FROM categories WHERE is_default = 1').run()).toThrow(
+      /Standardkategorie/,
+    );
+
+    const streamingId = db.prepare(`SELECT id FROM categories WHERE name = 'Streaming & Abos'`).get()?.['id'];
+    const defaultId = db.prepare('SELECT id FROM categories WHERE is_default = 1').get()?.['id'];
+    const ruleId = db.prepare('SELECT id FROM rules WHERE category_id = ? LIMIT 1').get(streamingId!)?.['id'];
+    const { lastInsertRowid: statementId } = db
+      .prepare(
+        `INSERT INTO statements (bank, iban, year, month, opening_cents, closing_cents, file_hash, file_name)
+         VALUES ('ING', 'DE00', 2026, 10, 0, -1299, 'hash', 'a.pdf')`,
+      )
+      .run();
+    db.prepare(
+      `INSERT INTO transactions (statement_id, booking_date, value_date, type, counterparty, purpose,
+                                 amount_cents, category_id, category_source, rule_id)
+       VALUES (?, '2026-10-02', '2026-10-02', 'Lastschrift', 'NETFLIX', '', -1299, ?, 'rule', ?)`,
+    ).run(statementId, streamingId!, ruleId!);
+
+    db.prepare('DELETE FROM categories WHERE id = ?').run(streamingId!);
+
+    const tx = db.prepare('SELECT category_id, category_source, rule_id FROM transactions').get();
+    expect(tx).toEqual({ category_id: defaultId, category_source: 'default', rule_id: null });
+    expect(Number(db.prepare('SELECT COUNT(*) AS n FROM rules WHERE category_id = ?').get(streamingId!)?.['n'])).toBe(0);
+
+    db.prepare('DELETE FROM statements').run();
+    expect(Number(db.prepare('SELECT COUNT(*) AS n FROM transactions').get()?.['n'])).toBe(0);
+  });
+
+  it('verhindert doppelte Auszüge (IBAN + Monat, Datei-Hash)', () => {
+    const db = memoryDb();
+    const insert = db.prepare(
+      `INSERT INTO statements (bank, iban, year, month, opening_cents, closing_cents, file_hash, file_name)
+       VALUES ('ING', ?, 2026, 10, 0, 0, ?, 'a.pdf')`,
+    );
+    insert.run('DE01', 'h1');
+    expect(() => insert.run('DE01', 'h2')).toThrow(/UNIQUE/);
+    expect(() => insert.run('DE02', 'h1')).toThrow(/UNIQUE/);
+  });
+});
+
+describe('Konfiguration', () => {
+  it('nutzt im Addon-Modus /data und den Ingress-IP-Filter', () => {
+    const config = loadConfig({ ADDON_MODE: '1' });
+    expect(config.dbPath).toBe('/data/budget.db');
+    expect(config.uploadsDir).toBe('/data/uploads');
+    expect(config.port).toBe(8099);
+    expect(config.host).toBe('0.0.0.0');
+    expect(config.allowedIps).toContain(INGRESS_PROXY_IP);
+  });
+
+  it('ist lokal ohne IP-Filter und per Env überschreibbar', () => {
+    expect(loadConfig({}).allowedIps).toBeNull();
+    const config = loadConfig({ DB_PATH: '/tmp/x.db', ALLOWED_IPS: '10.0.0.1, 10.0.0.2', PORT: '9000' });
+    expect(config.dbPath).toBe('/tmp/x.db');
+    expect(config.allowedIps).toEqual(['10.0.0.1', '10.0.0.2']);
+    expect(config.port).toBe(9000);
+  });
+});
+
+describe('HTTP-Server', () => {
+  it('liefert Health-Check und JSON-404 unter /api', async () => {
+    const app = createApp(memoryDb(), { version: '1.2.3' });
+    await request(app).get('/api/health').expect(200, { status: 'ok', version: '1.2.3' });
+    const res = await request(app).get('/api/unknown').expect(404);
+    expect(res.body.code).toBe('NOT_FOUND');
+    expect(res.headers['x-powered-by']).toBeUndefined();
+  });
+
+  it('antwortet auf ungültiges JSON mit 400', async () => {
+    const app = createApp(memoryDb());
+    await request(app)
+      .post('/api/health')
+      .set('Content-Type', 'application/json')
+      .send('{kaputt')
+      .expect(400);
+  });
+
+  it('liefert die Angular-App statisch aus (SPA-Fallback)', async () => {
+    const dir = tempDir();
+    writeFileSync(join(dir, 'index.html'), '<html><base href="./"></html>');
+    writeFileSync(join(dir, 'main-ABCDEFGH.js'), 'console.log(1)');
+    const app = createApp(memoryDb(), { staticDir: dir });
+
+    const index = await request(app).get('/').expect(200);
+    expect(index.text).toContain('base href="./"');
+    expect(index.headers['cache-control']).toBe('no-cache');
+
+    const asset = await request(app).get('/main-ABCDEFGH.js').expect(200);
+    expect(asset.headers['cache-control']).toContain('immutable');
+
+    await request(app).get('/irgendwas').expect(200);
+  });
+
+  it('blockiert im Addon-Modus Anfragen, die nicht vom Ingress-Proxy kommen', async () => {
+    // supertest verbindet über Loopback
+    const blocked = createApp(memoryDb(), { allowedIps: [INGRESS_PROXY_IP] });
+    await request(blocked).get('/api/health').set('X-Forwarded-For', INGRESS_PROXY_IP).expect(403);
+
+    const allowed = createApp(memoryDb(), { allowedIps: [INGRESS_PROXY_IP, '127.0.0.1', '::1'] });
+    await request(allowed).get('/api/health').expect(200);
+  });
+
+  it('normalisiert IPv4-mapped-Adressen', () => {
+    expect(normalizeIp('::ffff:172.30.32.2')).toBe(INGRESS_PROXY_IP);
+    let passed = false;
+    ipFilter([INGRESS_PROXY_IP])(
+      { socket: { remoteAddress: '::ffff:172.30.32.2' } } as never,
+      {} as never,
+      () => (passed = true),
+    );
+    expect(passed).toBe(true);
+  });
+});

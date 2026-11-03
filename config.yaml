@@ -1,0 +1,20 @@
+name: Haushaltsbuch
+version: "0.1.0"
+slug: budget_tracker
+description: Haushaltsbuch für ING-Kontoauszüge (PDF) mit automatischer Kategorisierung
+arch:
+  - amd64
+  - aarch64
+startup: application
+boot: auto
+init: true
+# Zugriff ausschließlich über HA-Ingress, keine Ports nach außen
+ingress: true
+ingress_port: 8099
+ingress_stream: false
+panel_icon: mdi:cash-multiple
+panel_title: Haushaltsbuch
+panel_admin: false
+# /data wird vom Supervisor immer persistent eingebunden (budget.db, uploads/)
+options: {}
+schema: {}

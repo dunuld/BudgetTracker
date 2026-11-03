@@ -1,0 +1,48 @@
+<h2>Transaktionen</h2>
+
+<div class="filters">
+  <div class="month-selector">
+    <button class="btn-icon" (click)="prevMonth()">◀</button>
+    <span>{{ monthLabel() }}</span>
+    <button class="btn-icon" (click)="nextMonth()">▶</button>
+  </div>
+
+  <select [value]="categoryId() ?? ''" (change)="onFilterCategoryChange($event)">
+    <option value="">Alle Kategorien</option>
+    <option *ngFor="let c of categories()" [value]="c.id">{{ c.name }}</option>
+  </select>
+
+  <input type="text" placeholder="Suchen …" [value]="search()" (input)="onSearchChange($event)" class="search-input">
+</div>
+
+<div *ngIf="error()" class="error">{{ error() }}</div>
+<div *ngIf="loading()" class="loading">Laden …</div>
+
+<table *ngIf="!loading() && transactions().length">
+  <thead>
+    <tr>
+      <th>Datum</th>
+      <th>Art</th>
+      <th>Empfänger</th>
+      <th>Verwendungszweck</th>
+      <th>Betrag</th>
+      <th>Kategorie</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let tx of transactions()">
+      <td>{{ tx.bookingDate | date:'dd.MM.yyyy' }}</td>
+      <td>{{ tx.type }}</td>
+      <td>{{ tx.counterparty }}</td>
+      <td class="purpose">{{ tx.purpose }}</td>
+      <td class="amount" [class.positive]="tx.amountCents > 0">{{ formatEuro(tx.amountCents) }}</td>
+      <td>
+        <select [value]="tx.categoryId ?? ''" (change)="onCategoryChange(tx, $event)">
+          <option *ngFor="let c of categories()" [value]="c.id" [style.color]="c.color">{{ c.name }}</option>
+        </select>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="!loading() && !transactions().length && !error()">Keine Transaktionen gefunden.</p>

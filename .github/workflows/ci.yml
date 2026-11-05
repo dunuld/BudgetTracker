@@ -1,0 +1,38 @@
+name: CI — Build & Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository klonen
+        uses: actions/checkout@v4
+
+      - name: Node.js 24 einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: budget_tracker/package-lock.json
+
+      - name: Dependencies installieren
+        run: npm ci
+        working-directory: budget_tracker
+
+      - name: TypeScript-Kompilierung & Build
+        run: npm run build:all
+        working-directory: budget_tracker
+
+      - name: Angular-Tests ausführen
+        run: npm test -- --watch=false --browsers=ChromeHeadless
+        working-directory: budget_tracker
+
+      - name: Server-Tests ausführen
+        run: npm run test:server
+        working-directory: budget_tracker

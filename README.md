@@ -1,7 +1,7 @@
 # Haushaltsbuch — Home Assistant Add-on
 
-[![GitHub release](https://img.shields.io/github/v/release/kroeppelt/BudgetTracker)](https://github.com/kroeppelt/BudgetTracker/releases)
-[![License](https://img.shields.io/github/license/kroeppelt/BudgetTracker)](https://github.com/kroeppelt/BudgetTracker/blob/main/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/dunuld/BudgetTracker)](https://github.com/dunuld/BudgetTracker/releases)
+[![License](https://img.shields.io/github/license/dunuld/BudgetTracker)](https://github.com/dunuld/BudgetTracker/blob/main/LICENSE)
 
 Home Assistant Add-on zum Verwalten von Haushaltsdaten aus ING-Kontoauszügen (PDF).
 
@@ -16,7 +16,7 @@ Lade PDF-Kontoauszüge hoch, lass die Buchungen automatisch kategorisieren und b
 3. Füge folgende URL hinzu und klicke **Hinzufügen**:
 
    ```
-   https://github.com/kroeppelt/BudgetTracker
+   https://github.com/dunuld/BudgetTracker
    ```
 
 4. Öffne den Add-on Store erneut und suche nach **Haushaltsbuch**.
@@ -78,8 +78,8 @@ Das Verzeichnis wird vom Home Assistant Supervisor automatisch verwaltet und ble
 
 Hast du eine Frage oder ein Problem?
 
-- **Issues**: [GitHub Issues](https://github.com/kroeppelt/BudgetTracker/issues) — melde Bugs oder schlage Verbesserungen vor.
-- **Diskussionen**: [GitHub Discussions](https://github.com/kroeppelt/BudgetTracker/discussions) — stelle Fragen oder teile Ideen.
+- **Issues**: [GitHub Issues](https://github.com/dunuld/BudgetTracker/issues) — melde Bugs oder schlage Verbesserungen vor.
+- **Diskussionen**: [GitHub Discussions](https://github.com/dunuld/BudgetTracker/discussions) — stelle Fragen oder teile Ideen.
 
 ---
 

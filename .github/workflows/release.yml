@@ -1,0 +1,41 @@
+name: Automated Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Repository klonen
+        uses: actions/checkout@v4
+
+      - name: Changelog-Eintrag extrahieren
+        id: changelog
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          # Extrahiere die Sektion für diesen Tag aus CHANGELOG.md
+          if [ -f CHANGELOG.md ]; then
+            CHANGELOG_ENTRY=$(awk "/^## ${TAG_NAME#v}/,/^## /" CHANGELOG.md | head -n -1)
+            if [ -z "$CHANGELOG_ENTRY" ]; then
+              CHANGELOG_ENTRY="Keine Release Notes in CHANGELOG.md gefunden."
+            fi
+          else
+            CHANGELOG_ENTRY="Keine CHANGELOG.md gefunden."
+          fi
+          # Escape für YAML
+          echo "$CHANGELOG_ENTRY" > release_notes.md
+
+      - name: GitHub Release erstellen
+        uses: softprops/action-gh-release@v2
+        with:
+          file: 'LICENSE'
+          body_path: release_notes.md
+          generate_release_notes: false
+          draft: false
+          prerelease: false

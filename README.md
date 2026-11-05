@@ -1,98 +1,94 @@
-# Haushaltsbuch – HomeAssistant Addon
+# Haushaltsbuch — Home Assistant Add-on
 
-Monatlich einen ING-Kontoauszug (PDF) hochladen, Transaktionen automatisch kategorisieren und als Diagramme darstellen. Läuft als HomeAssistant-Addon über Ingress.
+[![GitHub release](https://img.shields.io/github/v/release/kroeppelt/BudgetTracker)](https://github.com/kroeppelt/BudgetTracker/releases)
+[![License](https://img.shields.io/github/license/kroeppelt/BudgetTracker)](https://github.com/kroeppelt/BudgetTracker/blob/main/LICENSE)
 
-[Dokumentation](DOCS.md) · [Changelog](CHANGELOG.md)
+Home Assistant Add-on zum Verwalten von Haushaltsdaten aus ING-Kontoauszügen (PDF).
 
-## Lokale Entwicklung
+Lade PDF-Kontoauszüge hoch, lass die Buchungen automatisch kategorisieren und behalte den Überblick über deine Finanzen — direkt in Home Assistant.
 
-Voraussetzungen: Node.js ≥ 24, npm.
+---
 
-```bash
-npm install
-```
+## Installation
 
-### Frontend + Backend gleichzeitig
+1. Öffne Home Assistant und navigiere zu **Einstellungen** → **Add-ons, Backup & Supervisor** → **Add-on Store**.
+2. Klicke oben rechts auf die **Drei Punkte** → **Repositories**.
+3. Füge folgende URL hinzu und klicke **Hinzufügen**:
 
-```bash
-# Terminal 1: Angular Dev-Server (mit API-Proxy zum Backend)
-npm start
+   ```
+   https://github.com/kroeppelt/BudgetTracker
+   ```
 
-# Terminal 2: Express-Backend
-npm run dev:server
-```
+4. Öffne den Add-on Store erneut und suche nach **Haushaltsbuch**.
+5. Klicke auf die Add-on-Karte und drücke **Installieren**.
+6. Starte das Add-on anschließend über den **Start**-Button.
 
-Öffne `http://localhost:4200/`. Der Proxy leitet `/api/*` an `http://localhost:8099` weiter.
+Nach dem Start erscheint das Haushaltsbuch als Panel in Home Assistant (Icon: 💵).
 
-### Build
+---
 
-```bash
-# Frontend + Backend bauen
-npm run build:all
+## Funktionen
 
-# Nur Frontend
-npm run build
+- **PDF-Upload**: Lade ING-Kontoauszüge (PDF) direkt hoch.
+- **Automatische Kategorisierung**: Buchungen werden automatisch nach Kategorien eingeordnet.
+- **Kategorien-Verwaltung**: Passe Kategorien und Regeln an deine Bedürfnisse an.
+- **Übersichtliches Dashboard**: Visualisiere deine Ausgaben und Einnahmen direkt in Home Assistant.
+- **Persistente Speicherung**: Alle Daten werden im `.data`-Verzeichnis des Add-ons gespeichert.
 
-# Nur Backend
-npm run build:server
-```
+---
 
-### Tests
+## Nutzung
 
-```bash
-# Server-Tests (Vitest)
-npm run test:server
+Nach der Installation und dem Start des Add-ons findest du das **Haushaltsbuch** als Panel in deiner Home Assistant-Weboberfläche.
 
-# Angular-Tests
-ng test
-```
+### Kontoauszüge hochladen
 
-### Docker-Image bauen
+1. Öffne das Haushaltsbuch-Panel.
+2. Navigiere zum Upload-Bereich.
+3. Wähle eine oder mehrere PDF-Dateien deiner ING-Kontoauszüge aus.
+4. Die Buchungen werden automatisch geparst und kategorisiert.
 
-```bash
-docker build -t budget-tracker .
-```
+### Kategorien verwalten
 
-## Projektstruktur
+Du kannst bestehende Kategorien bearbeiten, neue Kategorien erstellen und Regeln für die automatische Zuordnung anpassen.
 
-```
-config.yaml              # HA-Addon-Konfiguration
-Dockerfile               # Multi-Stage Build (node:24-alpine)
-shared/api-types.ts      # Gemeinsame DTOs
-server/                  # Express-Backend (TypeScript)
-  src/main.ts            # Entry Point, Port 8099
-  src/db/                # SQLite-Schema, Seed-Daten
-  src/parsing/           # PDF-Textextraktion, ING-Parser
-  src/categorization/    # Regelbasierte Kategorisierung
-  src/services/          # Import, Reports
-  src/routes/            # REST-API-Endpunkte
-  test/                  # Server-Tests
-src/                     # Angular-Frontend
-  app/core/              # ApiService, Format-Helfer
-  app/features/          # Feature-Komponenten (Upload, Übersicht, etc.)
-  app/shared/            # Chart-Wrapper
-```
+---
 
-## Architektur
+## Daten
 
-```mermaid
-graph LR
-HA[HA Frontend Ingress] --> EX[Express Server :8099]
-EX --> ST[Static Angular Build]
-EX --> API[REST /api]
-API --> IMP[ImportService]
-IMP --> PDF[pdfjs-dist]
-PDF --> ING[IngParser]
-IMP --> CAT[Categorizer]
-API --> REP[ReportService]
-IMP --> DB[(SQLite /data/budget.db)]
-CAT --> DB
-REP --> DB
-```
+Alle Daten werden im persistenten `.data`-Verzeichnis des Add-ons gespeichert:
 
-## Lizenzen
+| Pfad | Beschreibung |
+|------|-------------|
+| `.data/budget.db` | SQLite-Datenbank mit allen Buchungen und Kategorien |
+| `.data/uploads/` | Hochgeladene PDF-Kontoauszüge |
 
-- Angular: MIT
-- Express: MIT
-- pdfjs-dist: Apache-2.0
-- chart.js: MIT
+Das Verzeichnis wird vom Home Assistant Supervisor automatisch verwaltet und bleibt bei Updates erhalten.
+
+---
+
+## System-Anforderungen
+
+- **Home Assistant** mit Supervisor (z. B. Home Assistant OS)
+- Unterstützte Architekturen: `amd64`, `aarch64`
+
+---
+
+## Support
+
+Hast du eine Frage oder ein Problem?
+
+- **Issues**: [GitHub Issues](https://github.com/kroeppelt/BudgetTracker/issues) — melde Bugs oder schlage Verbesserungen vor.
+- **Diskussionen**: [GitHub Discussions](https://github.com/kroeppelt/BudgetTracker/discussions) — stelle Fragen oder teile Ideen.
+
+---
+
+## Changelog
+
+Alle relevanten Änderungen werden in der [CHANGELOG.md](CHANGELOG.md) dokumentiert.
+
+---
+
+## Lizenz
+
+Dieses Projekt steht unter der [MIT-Lizenz](LICENSE).

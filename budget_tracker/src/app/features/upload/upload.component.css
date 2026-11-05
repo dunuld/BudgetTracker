@@ -13,25 +13,26 @@ h2 { margin: 0 0 1rem; }
   align-items: center;
   gap: 0.5rem;
   padding: 3rem 2rem;
-  border: 2px dashed #ccc;
+  border: 2px dashed var(--bt-border-input);
   border-radius: 8px;
   cursor: pointer;
   transition: border-color 0.2s;
   width: 100%;
   max-width: 500px;
+  color: var(--bt-text);
 }
 
-.drop-zone:hover { border-color: #03a9f4; }
+.drop-zone:hover { border-color: var(--bt-primary); }
 
 .drop-zone .icon { font-size: 2rem; }
 
-.file-name { color: #666; font-size: 0.9rem; }
+.file-name { color: var(--bt-text-secondary); font-size: 0.9rem; }
 
-.loading { color: #888; }
+.loading { color: var(--bt-text-muted); }
 
 .error {
-  background: #ffebee;
-  color: #c62828;
+  background: var(--bt-error-bg);
+  color: var(--bt-error-text);
   padding: 0.8rem;
   border-radius: 4px;
   margin-top: 1rem;
@@ -40,11 +41,12 @@ h2 { margin: 0 0 1rem; }
 .result {
   margin-top: 1.5rem;
   padding: 1rem;
-  background: #e8f5e9;
+  background: var(--bt-success-bg);
   border-radius: 8px;
+  color: var(--bt-text);
 }
 
-.result h3 { margin: 0 0 0.8rem; color: #2e7d32; }
+.result h3 { margin: 0 0 0.8rem; color: var(--bt-success-text); }
 
 .result dl {
   display: grid;
@@ -53,11 +55,11 @@ h2 { margin: 0 0 1rem; }
   margin: 0;
 }
 
-.result dt { font-weight: 600; color: #555; }
+.result dt { font-weight: 600; color: var(--bt-text-secondary); }
 
 .warning {
-  background: #fff3e0;
-  color: #e65100;
+  background: var(--bt-warning-bg);
+  color: var(--bt-warning-text);
   padding: 0.6rem 0.8rem;
   border-radius: 4px;
   margin-top: 0.5rem;

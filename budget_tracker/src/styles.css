@@ -1,1 +1,107 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* === Theme Variables === */
+
+:root {
+  /* Light theme (default) */
+  --bt-bg: #ffffff;
+  --bt-bg-secondary: #f5f5f5;
+  --bt-bg-tertiary: #e0e0e0;
+  --bt-text: #212121;
+  --bt-text-secondary: #666666;
+  --bt-text-muted: #888888;
+  --bt-border: #e0e0e0;
+  --bt-border-input: #cccccc;
+  --bt-hover: rgba(0, 0, 0, 0.04);
+  --bt-hover-btn: #f0f0f0;
+  --bt-active: rgba(3, 169, 244, 0.12);
+  --bt-primary: #03a9f4;
+  --bt-code-bg: #f5f5f5;
+  --bt-badge-bg: #e0e0e0;
+  --bt-row-hover: #f5f5f5;
+
+  /* Cards */
+  --bt-card-income-bg: #e8f5e9;
+  --bt-card-expense-bg: #ffebee;
+  --bt-card-balance-bg: #e3f2fd;
+
+  /* Alerts */
+  --bt-error-bg: #ffebee;
+  --bt-error-text: #c62828;
+  --bt-success-bg: #e8f5e9;
+  --bt-success-text: #2e7d32;
+  --bt-warning-bg: #fff3e0;
+  --bt-warning-text: #e65100;
+
+  /* Chart defaults */
+  --bt-chart-text: #666666;
+  --bt-chart-grid: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  --bt-bg: #1e1e1e;
+  --bt-bg-secondary: #2c2c2c;
+  --bt-bg-tertiary: #3c3c3c;
+  --bt-text: #e0e0e0;
+  --bt-text-secondary: #b0b0b0;
+  --bt-text-muted: #888888;
+  --bt-border: #3c3c3c;
+  --bt-border-input: #555555;
+  --bt-hover: rgba(255, 255, 255, 0.06);
+  --bt-hover-btn: #3c3c3c;
+  --bt-active: rgba(3, 169, 244, 0.2);
+  --bt-primary: #40c4ff;
+  --bt-code-bg: #2c2c2c;
+  --bt-badge-bg: #3c3c3c;
+  --bt-row-hover: #2c2c2c;
+
+  /* Cards */
+  --bt-card-income-bg: #1b3a1b;
+  --bt-card-expense-bg: #3a1b1b;
+  --bt-card-balance-bg: #1b2a3a;
+
+  /* Alerts */
+  --bt-error-bg: #3a1b1b;
+  --bt-error-text: #ef9a9a;
+  --bt-success-bg: #1b3a1b;
+  --bt-success-text: #a5d6a7;
+  --bt-warning-bg: #3a2e1b;
+  --bt-warning-text: #ffcc80;
+
+  /* Chart defaults */
+  --bt-chart-text: #b0b0b0;
+  --bt-chart-grid: rgba(255, 255, 255, 0.1);
+}
+
+/* Auto-detect system preference when no explicit theme is set */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bt-bg: #1e1e1e;
+    --bt-bg-secondary: #2c2c2c;
+    --bt-bg-tertiary: #3c3c3c;
+    --bt-text: #e0e0e0;
+    --bt-text-secondary: #b0b0b0;
+    --bt-text-muted: #888888;
+    --bt-border: #3c3c3c;
+    --bt-border-input: #555555;
+    --bt-hover: rgba(255, 255, 255, 0.06);
+    --bt-hover-btn: #3c3c3c;
+    --bt-active: rgba(3, 169, 244, 0.2);
+    --bt-primary: #40c4ff;
+    --bt-code-bg: #2c2c2c;
+    --bt-badge-bg: #3c3c3c;
+    --bt-row-hover: #2c2c2c;
+    --bt-card-income-bg: #1b3a1b;
+    --bt-card-expense-bg: #3a1b1b;
+    --bt-card-balance-bg: #1b2a3a;
+    --bt-error-bg: #3a1b1b;
+    --bt-error-text: #ef9a9a;
+    --bt-success-bg: #1b3a1b;
+    --bt-success-text: #a5d6a7;
+    --bt-warning-bg: #3a2e1b;
+    --bt-warning-text: #ffcc80;
+    --bt-chart-text: #b0b0b0;
+    --bt-chart-grid: rgba(255, 255, 255, 0.1);
+  }
+}

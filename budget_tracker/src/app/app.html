@@ -5,6 +5,10 @@
   <a routerLink="trend" routerLinkActive="active">Verlauf</a>
   <a routerLink="upload" routerLinkActive="active">Upload</a>
   <a routerLink="settings" routerLinkActive="active">Einstellungen</a>
+  <div class="nav-spacer"></div>
+  <button class="theme-toggle" (click)="themeService.toggle()" [title]="themeTitle()" type="button">
+    {{ themeLabel() }}
+  </button>
 </nav>
 <main class="app-main">
   <router-outlet></router-outlet>

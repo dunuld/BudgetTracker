@@ -3,6 +3,14 @@ import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
+function getThemeColors(): { textColor: string; gridColor: string } {
+  const styles = getComputedStyle(document.documentElement);
+  return {
+    textColor: styles.getPropertyValue('--bt-chart-text').trim() || '#666',
+    gridColor: styles.getPropertyValue('--bt-chart-grid').trim() || 'rgba(0,0,0,0.1)',
+  };
+}
+
 @Component({
   selector: 'app-chart',
   standalone: true,
@@ -46,6 +54,8 @@ export default class ChartComponent implements OnDestroy {
       borderWidth: d.borderWidth ?? 1,
     }));
 
+    const theme = getThemeColors();
+
     const options: Record<string, unknown> = {
       responsive: true,
       maintainAspectRatio: true,
@@ -53,8 +63,23 @@ export default class ChartComponent implements OnDestroy {
         legend: {
           display: type === 'doughnut',
           position: 'bottom' as const,
+          labels: {
+            color: theme.textColor,
+          },
         },
       },
+      scales: type === 'bar'
+        ? {
+            x: {
+              ticks: { color: theme.textColor },
+              grid: { color: theme.gridColor },
+            },
+            y: {
+              ticks: { color: theme.textColor },
+              grid: { color: theme.gridColor },
+            },
+          }
+        : undefined,
       ...this.options(),
     };
 

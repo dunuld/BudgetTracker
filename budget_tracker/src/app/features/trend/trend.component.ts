@@ -80,7 +80,7 @@ import type { Category, TrendMonth, TrendReport } from '../../../../shared/api-t
       font-size: 0.9rem;
     }
     .btn-primary {
-      background: var(--ha-primary-color, #03a9f4);
+      background: var(--ha-primary-color, var(--bt-primary));
       color: white;
       border: none;
       border-radius: 4px;
@@ -94,8 +94,8 @@ import type { Category, TrendMonth, TrendReport } from '../../../../shared/api-t
 
     .trend-table { margin-bottom: 1rem; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid #eee; }
-    th { font-size: 0.85rem; color: #666; font-weight: 600; white-space: nowrap; }
+    th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--bt-border); }
+    th { font-size: 0.85rem; color: var(--bt-text-secondary); font-weight: 600; white-space: nowrap; }
     .text-right { text-align: right; }
     .color-dot {
       display: inline-block;
@@ -106,7 +106,7 @@ import type { Category, TrendMonth, TrendReport } from '../../../../shared/api-t
       vertical-align: middle;
     }
 
-    .loading, .empty { color: #888; text-align: center; padding: 2rem; }
+    .loading, .empty { color: var(--bt-text-muted); text-align: center; padding: 2rem; }
   `,
 })
 export default class TrendComponent {

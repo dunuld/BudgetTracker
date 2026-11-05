@@ -164,7 +164,7 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
       display: flex;
       gap: 0.5rem;
       margin-bottom: 1.5rem;
-      border-bottom: 2px solid #e0e0e0;
+      border-bottom: 2px solid var(--bt-border);
     }
     .tab {
       background: none;
@@ -172,13 +172,13 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
       padding: 0.5rem 1rem;
       cursor: pointer;
       font-size: 0.95rem;
-      color: #666;
+      color: var(--bt-text-secondary);
       border-bottom: 2px solid transparent;
       margin-bottom: -2px;
     }
     .tab.active {
-      color: var(--ha-primary-color, #03a9f4);
-      border-bottom-color: var(--ha-primary-color, #03a9f4);
+      color: var(--ha-primary-color, var(--bt-primary));
+      border-bottom-color: var(--ha-primary-color, var(--bt-primary));
       font-weight: 600;
     }
 
@@ -193,20 +193,22 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
     }
     .input {
       padding: 0.4rem 0.6rem;
-      border: 1px solid #ccc;
+      border: 1px solid var(--bt-border-input);
       border-radius: 4px;
       font-size: 0.9rem;
+      color: var(--bt-text);
+      background: var(--bt-bg);
     }
     .color-input {
       width: 40px;
       height: 32px;
       padding: 2px;
-      border: 1px solid #ccc;
+      border: 1px solid var(--bt-border-input);
       border-radius: 4px;
       cursor: pointer;
     }
     .btn-primary {
-      background: var(--ha-primary-color, #03a9f4);
+      background: var(--ha-primary-color, var(--bt-primary));
       color: white;
       border: none;
       border-radius: 4px;
@@ -215,8 +217,8 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
       font-size: 0.9rem;
     }
     .btn-secondary {
-      background: #e0e0e0;
-      color: #333;
+      background: var(--bt-bg-tertiary);
+      color: var(--bt-text);
       border: none;
       border-radius: 4px;
       padding: 0.4rem 1rem;
@@ -236,9 +238,9 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
     }
 
     table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
-    th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid #eee; }
-    th { font-size: 0.85rem; color: #666; font-weight: 600; }
-    code { background: #f5f5f5; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.85rem; }
+    th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--bt-border); }
+    th { font-size: 0.85rem; color: var(--bt-text-secondary); font-weight: 600; }
+    code { background: var(--bt-code-bg); padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.85rem; color: var(--bt-text); }
 
     .color-dot {
       display: inline-block;
@@ -250,17 +252,17 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
     }
     .badge {
       display: inline-block;
-      background: #e0e0e0;
-      color: #666;
+      background: var(--bt-badge-bg);
+      color: var(--bt-text-secondary);
       font-size: 0.75rem;
       padding: 0.1rem 0.4rem;
       border-radius: 3px;
       margin-left: 0.5rem;
     }
 
-    .success-msg { color: #4caf50; font-size: 0.9rem; margin-left: 0.5rem; }
-    .error-msg { color: #f44336; font-size: 0.9rem; margin-top: 0.5rem; }
-    .empty { color: #888; text-align: center; padding: 2rem; }
+    .success-msg { color: var(--bt-success-text); font-size: 0.9rem; margin-left: 0.5rem; }
+    .error-msg { color: var(--bt-error-text); font-size: 0.9rem; margin-top: 0.5rem; }
+    .empty { color: var(--bt-text-muted); text-align: center; padding: 2rem; }
   `,
 })
 export default class SettingsComponent {

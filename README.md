@@ -85,7 +85,7 @@ Hast du eine Frage oder ein Problem?
 
 ## Changelog
 
-Alle relevanten Änderungen werden in der [CHANGELOG.md](CHANGELOG.md) dokumentiert.
+Siehe [CHANGELOG.md](CHANGELOG.md) für eine Übersicht aller Änderungen pro Version.
 
 ---
 

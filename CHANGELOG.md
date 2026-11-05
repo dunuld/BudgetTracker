@@ -12,6 +12,7 @@
 - **Duplikaterkennung**: Bereits importierte Auszüge werden erkannt und können ersetzt werden
 - **Saldo-Prüfung**: Warnung wenn Summe der Buchungen nicht der Saldo-Differenz entspricht
 - **Regeln neu anwenden**: Alle nicht-manuell zugeordneten Buchungen mit aktuellen Regeln aktualisieren
+- **Dark Mode**: Umschaltbarer dunkler Modus mit drei Stufen (Hell, Dunkel, System-Einstellung); Wahl wird im localStorage gespeichert; Diagramme passen sich automatisch an
 
 ### Technik
 - Angular 22 Frontend mit Signal-basierten Komponenten

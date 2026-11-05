@@ -105,12 +105,13 @@ import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types'
       text-align: center;
     }
     .btn-icon {
-      background: var(--ha-hover-color, #e0e0e0);
+      background: var(--ha-hover-color, var(--bt-bg-tertiary));
       border: none;
       border-radius: 4px;
       padding: 0.3rem 0.6rem;
       font-size: 1.2rem;
       cursor: pointer;
+      color: var(--bt-text);
     }
     .btn-icon:disabled { opacity: 0.4; cursor: default; }
 
@@ -127,11 +128,11 @@ import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types'
       flex-direction: column;
       gap: 0.25rem;
     }
-    .card.income { background: #e8f5e9; }
-    .card.expense { background: #ffebee; }
-    .card.balance { background: #e3f2fd; }
-    .card-label { font-size: 0.85rem; color: #666; }
-    .card-value { font-size: 1.4rem; font-weight: 700; }
+    .card.income { background: var(--bt-card-income-bg); }
+    .card.expense { background: var(--bt-card-expense-bg); }
+    .card.balance { background: var(--bt-card-balance-bg); }
+    .card-label { font-size: 0.85rem; color: var(--bt-text-secondary); }
+    .card-value { font-size: 1.4rem; font-weight: 700; color: var(--bt-text); }
 
     .chart-section { margin-bottom: 2rem; }
     .chart-section h3 { margin: 0 0 1rem; }
@@ -142,11 +143,11 @@ import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types'
 
     .category-table { margin-bottom: 1rem; }
     table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid #eee; }
-    th { font-size: 0.85rem; color: #666; font-weight: 600; }
+    th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--bt-border); }
+    th { font-size: 0.85rem; color: var(--bt-text-secondary); font-weight: 600; }
     .text-right { text-align: right; }
     .clickable { cursor: pointer; }
-    .clickable:hover { background: #f5f5f5; }
+    .clickable:hover { background: var(--bt-row-hover); }
     .color-dot {
       display: inline-block;
       width: 12px;
@@ -156,7 +157,7 @@ import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types'
       vertical-align: middle;
     }
 
-    .loading, .empty { color: #888; text-align: center; padding: 2rem; }
+    .loading, .empty { color: var(--bt-text-muted); text-align: center; padding: 2rem; }
   `,
 })
 export default class OverviewComponent {

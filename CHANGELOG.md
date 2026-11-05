@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 (2026-11-03)
+## 1.0.0 (2026-11-05)
 
 ### Hinzugefügt
 - **PDF-Import**: ING-Girokonto-Kontoauszüge als PDF hochladen, Transaktionen automatisch parsen

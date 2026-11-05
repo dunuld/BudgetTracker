@@ -15,11 +15,13 @@ export class ThemeService {
   constructor() {
     this.apply(this._mode());
     // React to system preference changes when in auto mode
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      if (this._mode() === 'auto') {
-        this.apply('auto');
-      }
-    });
+    if (typeof window.matchMedia === 'function') {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (this._mode() === 'auto') {
+          this.apply('auto');
+        }
+      });
+    }
   }
 
   setMode(mode: ThemeMode) {
@@ -45,9 +47,12 @@ export class ThemeService {
 
   private apply(mode: ThemeMode) {
     const html = document.documentElement;
-    if (mode === 'auto') {
+    if (mode === 'auto' && typeof window.matchMedia === 'function') {
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       html.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    } else if (mode === 'auto') {
+      /* no matchMedia — default to light */
+      html.setAttribute('data-theme', 'light');
     } else {
       html.setAttribute('data-theme', mode);
     }

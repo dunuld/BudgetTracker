@@ -30,7 +30,7 @@ jobs:
         working-directory: budget_tracker
 
       - name: Angular-Tests ausführen
-        run: npm test -- --watch=false --browsers=ChromeHeadless
+        run: npm test -- --watch=false
         working-directory: budget_tracker
 
       - name: Server-Tests ausführen

@@ -1,0 +1,113 @@
+name: 🐛 Fehler melden
+description: Ein Add-on funktioniert nicht wie erwartet.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke, dass du dir die Zeit nimmst, einen Fehler zu melden!
+        Bitte prüfe vorher, ob es zu dem Problem schon ein [offenes Issue](https://github.com/dunuld/hassio-addons/issues) gibt.
+
+        > [!WARNING]
+        > **Keine echten Kontoauszüge, IBANs, Namen oder Beträge hochladen!**
+        > Schwärze persönliche Daten in Screenshots, Logs und Beispiel-PDFs, bevor du sie anhängst.
+
+  - type: dropdown
+    id: addon
+    attributes:
+      label: Add-on
+      description: Welches Add-on ist betroffen?
+      options:
+        - Haushaltsbuch (budget_tracker)
+        - Neues Add-on (new_addon)
+        - Repository allgemein (Installation, Workflows, Doku)
+    validations:
+      required: true
+
+  - type: input
+    id: addon-version
+    attributes:
+      label: Add-on-Version
+      description: Zu finden unter **Einstellungen → Add-ons → \<Add-on\>**.
+      placeholder: "z. B. 1.1.1"
+    validations:
+      required: true
+
+  - type: input
+    id: ha-version
+    attributes:
+      label: Home Assistant Version
+      description: Zu finden unter **Einstellungen → Info**.
+      placeholder: "z. B. Core 2026.11.0, Supervisor 2026.10.2, OS 16.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: arch
+    attributes:
+      label: Architektur
+      options:
+        - amd64
+        - aarch64
+        - Weiß ich nicht
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Beschreibung des Fehlers
+      description: Was ist passiert? Beschreibe das Problem möglichst konkret.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Schritte zur Reproduktion
+      description: Wie lässt sich der Fehler nachstellen?
+      placeholder: |
+        1. Add-on öffnen
+        2. Auf „…“ klicken
+        3. PDF hochladen
+        4. Fehler erscheint
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes Verhalten
+      description: Was hättest du stattdessen erwartet?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Add-on-Log
+      description: |
+        Log unter **Einstellungen → Add-ons → \<Add-on\> → Protokoll**.
+        Wird automatisch als Code formatiert – persönliche Daten bitte vorher entfernen.
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Weitere Informationen
+      description: |
+        Screenshots, Browser-Konsole, betroffener Kontoauszugs-Typ (z. B. Girokonto, Extra-Konto)
+        oder sonstige Hinweise.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checkliste
+      options:
+        - label: Ich habe nach bestehenden Issues zu diesem Problem gesucht.
+          required: true
+        - label: Ich habe die neueste Version des Add-ons installiert.
+          required: false
+        - label: Ich habe persönliche Daten (IBAN, Namen, Beträge) aus allen Anhängen entfernt.
+          required: true

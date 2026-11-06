@@ -1,68 +1,101 @@
-# Haushaltsbuch – HomeAssistant Addon
+# Home Assistant Add-on: Haushaltsbuch
 
-Ein HomeAssistant-Addon zum Verwalten des gemeinsamen Haushaltsbudgets. Monatlich wird ein ING-Kontoauszug (PDF) hochgeladen, alle Transaktionen werden automatisch kategorisiert und als Diagramme dargestellt.
+Das Haushaltsbuch verwaltet dein Haushaltsbudget auf Basis von ING-Kontoauszügen. Monatlich wird
+ein Kontoauszug (PDF) hochgeladen, alle Transaktionen werden automatisch kategorisiert und als
+Diagramme dargestellt.
 
 ## Installation
 
-1. Dieses Verzeichnis als `budget_tracker` in dein HomeAssistant-Addons-Verzeichnis kopieren:
-   ```bash
-   cp -r /pfad/zu/BudgetTracker /addons/budget_tracker
-   ```
-2. In HomeAssistant unter **Einstellungen → Add-ons, Backup & Supervisor** nach unten scrollen bis **Add-on Store**.
-3. Oben rechts auf das Menü klicken und **Updates abrufen** wählen.
-4. Das Addon **Haushaltsbuch** finden, installieren und starten.
-5. Über die Seitenleiste von HomeAssistant ist das Addon dann als **Haushaltsbuch** (Icon: 💰) erreichbar.
+Die Installation dieses Add-ons ist einfach und unterscheidet sich nicht von anderen
+Home Assistant Add-ons:
+
+1. Das Repository `https://github.com/dunuld/BudgetTracker` im Add-on Store hinzufügen
+   (**Einstellungen → Add-ons → Add-on Store → ⋮ → Repositories**).
+2. Im Add-on Store nach **Haushaltsbuch** suchen und auf **Installieren** klicken.
+3. Das Add-on **starten**.
+4. Optional **In Seitenleiste anzeigen** aktivieren – das Haushaltsbuch erscheint dann als Panel
+   mit dem Icon `mdi:cash-multiple` in der Seitenleiste.
+5. Über **Benutzeroberfläche öffnen** oder das Panel in der Seitenleiste starten.
+
+## Konfiguration
+
+Das Add-on benötigt keine Konfiguration – es gibt keine Optionen im Tab **Konfiguration**.
+Der Zugriff erfolgt ausschließlich über Home Assistant Ingress; es werden keine Ports nach außen
+geöffnet.
 
 ## Nutzung
 
-### PDF hochladen
+### Kontoauszug hochladen
 
 1. Im Menü auf **Upload** klicken.
 2. Den ING-Kontoauszug als PDF auswählen und hochladen.
-3. Nach dem Import siehst du: Zeitraum, Anzahl Buchungen, Saldo-Prüfung und Anzahl der automatisch kategorisierten Buchungen.
+3. Nach dem Import siehst du Zeitraum, Anzahl der Buchungen, Saldo-Prüfung und die Anzahl der
+   automatisch kategorisierten Buchungen.
+
+Wurde ein Auszug bereits importiert, wird dies erkannt und du kannst ihn ersetzen.
 
 ### Monatsübersicht
 
-- Die Startseite zeigt Einnahmen, Ausgaben und Saldo des aktuellen Monats.
+- Die Startseite zeigt Einnahmen, Ausgaben und Saldo des gewählten Monats.
 - Ein Donut-Diagramm visualisiert die Ausgaben nach Kategorie.
-- Klick auf eine Kategorie öffnet die gefilterte Transaktionsliste.
-- Mit den Pfeilen kannst du zwischen Monaten navigieren.
+- Ein Klick auf eine Kategorie öffnet die gefilterte Transaktionsliste.
+- Mit den Pfeilen navigierst du zwischen den Monaten.
 
 ### Transaktionen
 
-- Alle Buchungen filterbar nach Monat, Kategorie und Freitext.
-- Kategorie einer Buchung direkt ändern.
-- Optional: Neue Regel für den Empfänger anlegen, damit künftige Buchungen automatisch zugeordnet werden.
+- Alle Buchungen sind filterbar nach Monat, Kategorie und Freitext.
+- Die Kategorie einer Buchung kann direkt geändert werden.
+- Optional kann dabei eine neue Regel für den Empfänger angelegt werden, damit künftige Buchungen
+  automatisch zugeordnet werden.
 
 ### Verlauf
 
-- Mehrere Monate vergleichen mit einem gestapelten Balkendiagramm.
-- Zeitraum über die Monatsauswähler festlegen.
+- Mehrere Monate lassen sich in einem gestapelten Balkendiagramm vergleichen.
+- Der Zeitraum wird über die Monatsauswahl festgelegt (maximal 120 Monate).
 
 ### Einstellungen
 
 - **Kategorien**: Neue Kategorien anlegen (Name, Farbe, Typ) oder bestehende löschen.
-- **Regeln**: Kategorisierungsregeln verwalten (Feld, Match-Typ, Muster, Priorität). „Regeln neu anwenden" aktualisiert alle nicht-manuell zugeordneten Buchungen.
+- **Regeln**: Kategorisierungsregeln verwalten (Feld, Match-Typ, Muster, Priorität).
+  **Regeln neu anwenden** aktualisiert alle nicht manuell zugeordneten Buchungen.
 - **Auszüge**: Importierte Kontoauszüge auflisten und löschen.
+
+### Darstellung
+
+Über den Theme-Umschalter in der Navigation wählst du zwischen Hell, Dunkel und System. Im Modus
+„System“ übernimmt das Panel Farben, Schrift und Hell/Dunkel des aktiven Home-Assistant-Themes.
 
 ## Datenspeicherung
 
-Alle Daten werden lokal im Addon-Container unter `/data` gespeichert:
+Alle Daten werden lokal im persistenten Add-on-Verzeichnis `/data` gespeichert, das vom
+Supervisor verwaltet wird und bei Updates erhalten bleibt:
 
-- `budget.db` – SQLite-Datenbank mit Kategorien, Regeln, Auszügen und Transaktionen.
-- `uploads/` – Original-PDFs der hochgeladenen Kontoauszüge.
+| Pfad              | Beschreibung                                                    |
+| ----------------- | --------------------------------------------------------------- |
+| `/data/budget.db` | SQLite-Datenbank mit Kategorien, Regeln, Auszügen und Buchungen |
+| `/data/uploads/`  | Original-PDFs der hochgeladenen Kontoauszüge                    |
 
-Die Daten verlassen niemals dein HomeAssistant-System.
+Die Daten verlassen niemals dein Home-Assistant-System und sind in Home-Assistant-Backups des
+Add-ons enthalten.
 
-## Grenzen
+## Bekannte Einschränkungen
 
-- **Nur ING-Kontoauszüge** werden unterstützt. Andere Banken sind nicht implementiert, aber das Parser-Interface ist vorbereitet für zukünftige Erweiterungen.
-- Keine HomeAssistant-Sensoren oder Entities – das Addon ist nur über die Weboberfläche (Ingress) erreichbar.
-- Keine KI-gestützte Kategorisierung – nur regelbasierte Zuordnung mit Keyword-Match.
+- Es werden **nur ING-Kontoauszüge** unterstützt. Das Parser-Interface ist für weitere Banken
+  vorbereitet, diese sind aber noch nicht implementiert.
+- Das Add-on stellt **keine Sensoren oder Entitäten** bereit – es ist nur über die Weboberfläche
+  (Ingress) erreichbar.
+- Die Kategorisierung ist **regelbasiert** (Keyword-/Regex-Abgleich), nicht KI-gestützt.
+- Unterstützte Architekturen: `amd64`, `aarch64`.
 
-## Technische Details
+## Support
 
-- **Frontend**: Angular 22 mit Signal-basierten Komponenten, Chart.js für Diagramme.
-- **Backend**: Node.js/Express (TypeScript), SQLite über `node:sqlite`.
-- **PDF-Parser**: pdfjs-dist mit ING-spezifischem Layout-Parser.
-- **Architektur**: Ein Docker-Container, der Angular statisch ausliefert und die REST-API bereitstellt.
+Hast du Fragen oder ein Problem gefunden?
+
+- [GitHub Issues](https://github.com/dunuld/BudgetTracker/issues) – Fehler melden oder
+  Verbesserungen vorschlagen
+- [GitHub Discussions](https://github.com/dunuld/BudgetTracker/discussions) – Fragen stellen und
+  Ideen teilen
+
+## Lizenz
+
+MIT – siehe [LICENSE](https://github.com/dunuld/BudgetTracker/blob/main/LICENSE).

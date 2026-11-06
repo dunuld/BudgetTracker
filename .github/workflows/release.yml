@@ -19,14 +19,14 @@ jobs:
         id: changelog
         run: |
           TAG_NAME="${GITHUB_REF#refs/tags/}"
-          # Extrahiere die Sektion für diesen Tag aus CHANGELOG.md
-          if [ -f CHANGELOG.md ]; then
+          # Extrahiere die Sektion für diesen Tag aus budget_tracker/CHANGELOG.md
+          if [ -f budget_tracker/CHANGELOG.md ]; then
             # Alles zwischen der Überschrift "## <Version>" und der nächsten "## "-Überschrift
             CHANGELOG_ENTRY=$(awk -v ver="${TAG_NAME#v}" '
               found && /^## / { exit }
               found { print }
               $0 == "## " ver || index($0, "## " ver " ") == 1 { found = 1 }
-            ' CHANGELOG.md)
+            ' budget_tracker/CHANGELOG.md)
             if [ -z "$CHANGELOG_ENTRY" ]; then
               CHANGELOG_ENTRY="Keine Release Notes in CHANGELOG.md gefunden."
             fi

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.1 (2026-11-06)
+
+### Geändert
+
+- **Dokumentation**: README und DOCS nach Home-Assistant-Add-on-Standard strukturiert; Links, Badges und „Repository hinzufügen“-Button zeigen auf das umbenannte Repository `dunuld/hassio-addons`
+
+### Technik
+
+- CI, Code Quality und Releases für mehrere Add-ons im Repository vorbereitet; Release-Tags haben jetzt die Form `budget_tracker-v<version>`
+
 ## 1.1.0 (2026-11-06)
 
 ### Geändert

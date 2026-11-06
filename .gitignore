@@ -4,20 +4,19 @@
 .idea/
 .junie/
 
-# Compiled output (im budget_tracker/)
-budget_tracker/dist
-budget_tracker/tmp
-budget_tracker/out-tsc
-budget_tracker/bazel-out
+# Compiled output (in den Add-on-Verzeichnissen)
+/*/dist
+/*/tmp
+/*/out-tsc
+/*/bazel-out
 
 # Node
-budget_tracker/node_modules
-budget_tracker/server/node_modules
-budget_tracker/npm-debug.log
-budget_tracker/yarn-error.log
+node_modules/
+/*/npm-debug.log
+/*/yarn-error.log
 
 # Lokale Addon-Daten (SQLite, Uploads)
-budget_tracker/.data
+/*/.data
 
 # IDEs and editors
 .project
@@ -37,13 +36,13 @@ budget_tracker/.data
 .history/*
 
 # Miscellaneous
-budget_tracker/.angular/cache
+/*/.angular/cache
 .sass-cache/
-budget_tracker/connect.lock
-budget_tracker/coverage
+/*/connect.lock
+/*/coverage
 /libpeerconnection.log
 testem.log
-budget_tracker/typings
+/*/typings
 __screenshots__/
 
 # System files

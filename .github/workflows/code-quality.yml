@@ -1,29 +1,67 @@
 name: Code Quality
 
+# Läuft pro Add-on: Bei Push/PR nur für Add-ons mit Änderungen (Änderungen an .github/ → alle),
+# manuell für alle. Der Release-Workflow ruft diesen Workflow für das getaggte Add-on auf.
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      addons:
+        description: 'JSON-Array der zu prüfenden Add-ons, z. B. ["budget_tracker"]'
+        type: string
+        required: true
 
 permissions:
   contents: read
 
 # Neuere Pushes auf denselben Branch brechen ältere Läufe ab.
+# Fester Präfix statt github.workflow (siehe ci.yml).
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: quality-${{ github.ref }}
   cancel-in-progress: true
 
-defaults:
-  run:
-    working-directory: budget_tracker
-
 jobs:
+  detect:
+    name: Betroffene Add-ons ermitteln
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      addons: ${{ steps.detect.outputs.addons }}
+
+    steps:
+      - name: Repository klonen
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Add-ons ermitteln
+        id: detect
+        env:
+          ADDONS: ${{ inputs.addons }}
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          addons=$(.github/scripts/changed-addons.sh)
+          echo "addons=$addons" >> "$GITHUB_OUTPUT"
+          echo "Zu prüfende Add-ons: $addons" >> "$GITHUB_STEP_SUMMARY"
+
   static-analysis:
-    name: Format, Lint & Typecheck
+    name: Format, Lint & Typecheck ${{ matrix.addon }}
+    needs: detect
+    if: ${{ needs.detect.outputs.addons != '[]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        addon: ${{ fromJSON(needs.detect.outputs.addons) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.addon }}
 
     steps:
       - name: Repository klonen
@@ -34,7 +72,7 @@ jobs:
         with:
           node-version: 24
           cache: 'npm'
-          cache-dependency-path: budget_tracker/package-lock.json
+          cache-dependency-path: ${{ matrix.addon }}/package-lock.json
 
       - name: Dependencies installieren
         run: npm ci
@@ -56,9 +94,18 @@ jobs:
         run: npm run typecheck
 
   dependencies:
-    name: Dependency Audit
+    name: Dependency Audit ${{ matrix.addon }}
+    needs: detect
+    if: ${{ needs.detect.outputs.addons != '[]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        addon: ${{ fromJSON(needs.detect.outputs.addons) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.addon }}
 
     steps:
       - name: Repository klonen

@@ -1,13 +1,88 @@
 name: Automated Release
 
+# Tags haben die Form <add-on-verzeichnis>-v<version>, z. B. budget_tracker-v1.2.0.
+# Ablauf: Tag prüfen → CI und Code Quality für dieses Add-on → GitHub-Release erstellen.
 on:
   push:
     tags:
-      - 'v*'
+      - '*-v*'
+
+permissions:
+  contents: read
 
 jobs:
-  release:
+  prepare:
+    name: Tag prüfen
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      addon: ${{ steps.tag.outputs.addon }}
+      addons: ${{ steps.tag.outputs.addons }}
+      version: ${{ steps.tag.outputs.version }}
+      name: ${{ steps.tag.outputs.name }}
+
+    steps:
+      - name: Repository klonen
+        uses: actions/checkout@v7
+
+      - name: Tag zerlegen und gegen config.yaml prüfen
+        id: tag
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          # Alles vor dem letzten "-v" ist das Add-on, der Rest die Version.
+          addon="${TAG_NAME%-v*}"
+          version="${TAG_NAME##*-v}"
+          config="$addon/config.yaml"
+
+          if [ ! -f "$config" ]; then
+            echo "::error::Tag $TAG_NAME: Add-on-Verzeichnis '$addon' mit config.yaml nicht gefunden."
+            exit 1
+          fi
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.+][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Tag $TAG_NAME: '$version' ist keine gültige Version (erwartet z. B. 1.2.0)."
+            exit 1
+          fi
+
+          config_version=$(yq -r '.version' "$config")
+          if [ "$config_version" != "$version" ]; then
+            echo "::error file=$config::Version in $config ist '$config_version', Tag verlangt '$version'."
+            exit 1
+          fi
+          if [ -f "$addon/package.json" ]; then
+            package_version=$(jq -r '.version' "$addon/package.json")
+            if [ "$package_version" != "$version" ]; then
+              echo "::error file=$addon/package.json::Version in package.json ist '$package_version', Tag verlangt '$version'."
+              exit 1
+            fi
+          fi
+
+          {
+            echo "addon=$addon"
+            echo "addons=$(jq --null-input --compact-output --arg a "$addon" '[$a]')"
+            echo "version=$version"
+            echo "name=$(yq -r '.name' "$config")"
+          } >> "$GITHUB_OUTPUT"
+
+  ci:
+    name: CI
+    needs: prepare
+    uses: ./.github/workflows/ci.yml
+    with:
+      addons: ${{ needs.prepare.outputs.addons }}
+
+  quality:
+    name: Code Quality
+    needs: prepare
+    uses: ./.github/workflows/code-quality.yml
+    with:
+      addons: ${{ needs.prepare.outputs.addons }}
+
+  release:
+    name: GitHub-Release erstellen
+    needs: [prepare, ci, quality]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: write
 
@@ -16,31 +91,33 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Changelog-Eintrag extrahieren
-        id: changelog
+        env:
+          ADDON: ${{ needs.prepare.outputs.addon }}
+          VERSION: ${{ needs.prepare.outputs.version }}
         run: |
-          TAG_NAME="${GITHUB_REF#refs/tags/}"
-          # Extrahiere die Sektion für diesen Tag aus budget_tracker/CHANGELOG.md
-          if [ -f budget_tracker/CHANGELOG.md ]; then
+          changelog="$ADDON/CHANGELOG.md"
+          if [ -f "$changelog" ]; then
             # Alles zwischen der Überschrift "## <Version>" und der nächsten "## "-Überschrift
-            CHANGELOG_ENTRY=$(awk -v ver="${TAG_NAME#v}" '
+            entry=$(awk -v ver="$VERSION" '
               found && /^## / { exit }
               found { print }
               $0 == "## " ver || index($0, "## " ver " ") == 1 { found = 1 }
-            ' budget_tracker/CHANGELOG.md)
-            if [ -z "$CHANGELOG_ENTRY" ]; then
-              CHANGELOG_ENTRY="Keine Release Notes in CHANGELOG.md gefunden."
+            ' "$changelog")
+            if [ -z "$entry" ]; then
+              entry="Keine Release Notes in $changelog gefunden."
             fi
           else
-            CHANGELOG_ENTRY="Keine CHANGELOG.md gefunden."
+            entry="Keine $changelog gefunden."
           fi
-          # Escape für YAML
-          echo "$CHANGELOG_ENTRY" > release_notes.md
+          echo "$entry" > release_notes.md
 
       - name: GitHub Release erstellen
         uses: softprops/action-gh-release@v2
         with:
+          name: ${{ needs.prepare.outputs.name }} ${{ needs.prepare.outputs.version }}
           file: 'LICENSE'
           body_path: release_notes.md
           generate_release_notes: false
           draft: false
-          prerelease: false
+          # Versionen wie 1.2.0-beta.1 werden als Pre-Release markiert.
+          prerelease: ${{ contains(needs.prepare.outputs.version, '-') }}

@@ -55,7 +55,8 @@ function toStatement(row: Record<string, unknown>): Statement {
 export function normalizeFileName(name: string | undefined): string {
   let result = basename(name?.trim() || 'kontoauszug.pdf');
   const decoded = Buffer.from(result, 'latin1').toString('utf8');
-  if (!decoded.includes('\uFFFD') && /[^\x00-\x7F]/.test(result)) result = decoded;
+  if (!decoded.includes('\uFFFD') && [...result].some((c) => c.charCodeAt(0) > 0x7f))
+    result = decoded;
   return result.slice(0, 200);
 }
 

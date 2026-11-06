@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { ApiService } from '../../core/api.service.js';
 import { formatEuro as fmtEuro, formatMonthYear as fmtMonthYear } from '../../core/format.js';
 import ChartComponent from '../../shared/chart.component.js';
-import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types';
+import type { MonthlyReport } from '../../../../shared/api-types';
 
 @Component({
   selector: 'app-overview',

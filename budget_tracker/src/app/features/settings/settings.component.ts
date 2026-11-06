@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/api.service.js';
@@ -403,7 +404,8 @@ export default class SettingsComponent {
         this.categories.update((cats) => [...cats, cat]);
         nameInput.value = '';
       },
-      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Erstellen'),
+      error: (err: HttpErrorResponse) =>
+        this.errorMsg.set(err.error?.error ?? 'Fehler beim Erstellen'),
     });
   }
 
@@ -414,7 +416,8 @@ export default class SettingsComponent {
         this.categories.update((cats) => cats.filter((c) => c.id !== id));
         this.loadRules();
       },
-      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
+      error: (err: HttpErrorResponse) =>
+        this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
     });
   }
 
@@ -438,7 +441,8 @@ export default class SettingsComponent {
         this.rules.update((rules) => [...rules, rule]);
         patternInput.value = '';
       },
-      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Erstellen'),
+      error: (err: HttpErrorResponse) =>
+        this.errorMsg.set(err.error?.error ?? 'Fehler beim Erstellen'),
     });
   }
 
@@ -447,7 +451,8 @@ export default class SettingsComponent {
       next: () => {
         this.rules.update((rules) => rules.filter((r) => r.id !== id));
       },
-      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
+      error: (err: HttpErrorResponse) =>
+        this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
     });
   }
 
@@ -472,7 +477,8 @@ export default class SettingsComponent {
       next: () => {
         this.statements.update((stmts) => stmts.filter((s) => s.id !== id));
       },
-      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
+      error: (err: HttpErrorResponse) =>
+        this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
     });
   }
 

@@ -1,0 +1,78 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Neuere Pushes auf denselben Branch brechen ältere Läufe ab.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: budget_tracker
+
+jobs:
+  static-analysis:
+    name: Format, Lint & Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Repository klonen
+        uses: actions/checkout@v4
+
+      - name: Node.js 24 einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: budget_tracker/package-lock.json
+
+      - name: Dependencies installieren
+        run: npm ci
+
+      # Alle Prüfungen laufen auch nach einem Fehlschlag weiter,
+      # damit ein Lauf sämtliche Probleme auf einmal meldet.
+      - name: Formatierung prüfen (Prettier)
+        id: format
+        run: npm run format:check
+
+      - name: Lint (ESLint)
+        id: lint
+        if: ${{ !cancelled() }}
+        run: npx eslint . --max-warnings=0
+
+      - name: TypeScript-Typprüfung (App, Specs, Server)
+        id: typecheck
+        if: ${{ !cancelled() }}
+        run: npm run typecheck
+
+  dependencies:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Repository klonen
+        uses: actions/checkout@v4
+
+      - name: Node.js 24 einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # Laufzeit-Abhängigkeiten landen im Addon-Image → hohe/kritische Lücken blockieren.
+      - name: Audit Produktions-Abhängigkeiten
+        run: npm audit --omit=dev --audit-level=high
+
+      # Dev-Tooling wird nur gemeldet, nicht blockiert.
+      - name: Audit aller Abhängigkeiten (informativ)
+        run: npm audit --audit-level=critical || echo "::warning::npm audit meldet Lücken in Dev-Abhängigkeiten"

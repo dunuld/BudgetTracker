@@ -1,5 +1,4 @@
 import { Component, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { formatEuro } from '../../core/format';
@@ -7,7 +6,7 @@ import type { ImportResult } from '../../../../shared/api-types';
 
 @Component({
   selector: 'app-upload',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './upload.component.html',
   styleUrl: './upload.component.css',
 })

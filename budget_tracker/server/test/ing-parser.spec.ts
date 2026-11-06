@@ -71,7 +71,6 @@ describe('ING-Parser mit synthetischem Kontoauszug', () => {
   });
 
   it('setzt umgebrochene Empfängernamen zusammen', () => {
-    const names = statement.transactions.map((t) => t.counterparty);
     // Alte Leipziger: Name ist 34 Zeichen (< SEPA_CHUNK=35), daher wird die Fortsetzung
     // nicht als Name erkannt, sondern als Verwendungszweck
     const alteLeipziger = statement.transactions.find(

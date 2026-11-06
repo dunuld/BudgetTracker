@@ -2,7 +2,8 @@ import { Component, computed, signal } from '@angular/core';
 import { ApiService } from '../../core/api.service.js';
 import { formatMonthYear as fmtMonthYear } from '../../core/format.js';
 import ChartComponent from '../../shared/chart.component.js';
-import type { Category, TrendMonth, TrendReport } from '../../../../shared/api-types';
+import type { TooltipItem } from 'chart.js';
+import type { TrendMonth, TrendReport } from '../../../../shared/api-types';
 
 @Component({
   selector: 'app-trend',
@@ -174,7 +175,7 @@ export default class TrendComponent {
     },
     plugins: {
       legend: { display: true, position: 'bottom' as const },
-      tooltip: { callbacks: { label: (ctx: any) => this.formatTooltip(ctx) } },
+      tooltip: { callbacks: { label: (ctx: TooltipItem<'bar'>) => this.formatTooltip(ctx) } },
     },
   }));
 
@@ -231,8 +232,8 @@ export default class TrendComponent {
     return `${(value / 100).toFixed(0)} €`;
   }
 
-  formatTooltip(context: any): string {
-    const value = context.parsed.y;
+  formatTooltip(context: TooltipItem<'bar'>): string {
+    const value = context.parsed.y ?? 0;
     return `${context.dataset.label}: ${this.formatEuro(value)}`;
   }
 

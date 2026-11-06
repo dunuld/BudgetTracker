@@ -228,7 +228,6 @@ export async function createSyntheticIngPdf(): Promise<Buffer> {
   draw(page1, '-8,50', amountX('-8,50'), y);
   y -= 12;
   draw(page1, 'Miete Oktober', 142, y);
-  y -= 12;
 
   // Fußzeilen
   draw(page1, '34GKKA1234567890_T', 28, 70);
@@ -317,7 +316,6 @@ export async function createSyntheticIngPdf(): Promise<Buffer> {
   draw2('Kunden-Information', 71, y);
   y -= 12;
   draw2('Ihr ING-Berater: Julia Schmidt', 71, y);
-  y -= 12;
 
   // Fußzeilen
   draw2('34GKKA1234567890_T', 28, 70);

@@ -1,13 +1,13 @@
 import { Component, signal, computed, effect, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../core/api.service';
-import { formatEuro, formatDate, formatMonthYear } from '../../core/format';
+import { formatEuro, formatMonthYear } from '../../core/format';
 import type { Category, Transaction, TransactionQuery } from '../../../../shared/api-types';
 
 @Component({
   selector: 'app-transactions',
-  imports: [CommonModule],
+  imports: [DatePipe],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
 })
@@ -57,7 +57,7 @@ export default class TransactionsComponent {
   }
 
   categoryName(id: number | null): string {
-    if (id == null) return '—';
+    if (id === null) return '—';
     return this.categories().find((c) => c.id === id)?.name ?? '—';
   }
 

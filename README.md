@@ -1,94 +1,71 @@
-# Haushaltsbuch — Home Assistant Add-on
+# Haushaltsbuch – Home Assistant Add-on Repository
 
-[![GitHub release](https://img.shields.io/github/v/release/dunuld/BudgetTracker)](https://github.com/dunuld/BudgetTracker/releases)
-[![License](https://img.shields.io/github/license/dunuld/BudgetTracker)](https://github.com/dunuld/BudgetTracker/blob/main/LICENSE)
+[![CI – Build & Tests][ci-badge]][ci-workflow]
+[![Code Quality][quality-badge]][quality-workflow]
+[![GitHub Release][release-badge]][releases]
+[![License][license-badge]](LICENSE)
+![Unterstützte Architekturen][arch-badge]
 
-Home Assistant Add-on zum Verwalten von Haushaltsdaten aus ING-Kontoauszügen (PDF).
+Home Assistant Add-on Repository für das **Haushaltsbuch**: ING-Kontoauszüge (PDF) hochladen,
+Buchungen automatisch kategorisieren und Einnahmen und Ausgaben direkt in Home Assistant auswerten.
 
-Lade PDF-Kontoauszüge hoch, lass die Buchungen automatisch kategorisieren und behalte den Überblick über deine Finanzen — direkt in Home Assistant.
+[![Repository zu Home Assistant hinzufügen][repo-btn]][repo-add]
 
----
+## Add-ons
+
+Dieses Repository enthält folgende Add-ons:
+
+### [Haushaltsbuch](./budget_tracker)
+
+![Version][version-badge]
+![amd64][amd64-badge]
+![aarch64][aarch64-badge]
+
+_Haushaltsbuch für ING-Kontoauszüge (PDF) mit automatischer Kategorisierung._
+
+[Dokumentation](budget_tracker/DOCS.md) · [Changelog](budget_tracker/CHANGELOG.md)
 
 ## Installation
 
-1. Öffne Home Assistant und navigiere zu **Einstellungen** → **Add-ons, Backup & Supervisor** → **Add-on Store**.
-2. Klicke oben rechts auf die **Drei Punkte** → **Repositories**.
-3. Füge folgende URL hinzu und klicke **Hinzufügen**:
+1. Klicke auf den Button **Repository zu Home Assistant hinzufügen** oben – oder füge das
+   Repository manuell hinzu:
+   1. In Home Assistant **Einstellungen → Add-ons → Add-on Store** öffnen.
+   2. Oben rechts über das Menü (⋮) **Repositories** wählen.
+   3. Folgende URL eintragen und **Hinzufügen** klicken:
 
-   ```
-   https://github.com/dunuld/BudgetTracker
-   ```
+      ```
+      https://github.com/dunuld/BudgetTracker
+      ```
 
-4. Öffne den Add-on Store erneut und suche nach **Haushaltsbuch**.
-5. Klicke auf die Add-on-Karte und drücke **Installieren**.
-6. Starte das Add-on anschließend über den **Start**-Button.
-
-Nach dem Start erscheint das Haushaltsbuch als Panel in Home Assistant (Icon: 💵).
-
----
-
-## Funktionen
-
-- **PDF-Upload**: Lade ING-Kontoauszüge (PDF) direkt hoch.
-- **Automatische Kategorisierung**: Buchungen werden automatisch nach Kategorien eingeordnet.
-- **Kategorien-Verwaltung**: Passe Kategorien und Regeln an deine Bedürfnisse an.
-- **Übersichtliches Dashboard**: Visualisiere deine Ausgaben und Einnahmen direkt in Home Assistant.
-- **Persistente Speicherung**: Alle Daten werden im `.data`-Verzeichnis des Add-ons gespeichert.
-
----
-
-## Nutzung
-
-Nach der Installation und dem Start des Add-ons findest du das **Haushaltsbuch** als Panel in deiner Home Assistant-Weboberfläche.
-
-### Kontoauszüge hochladen
-
-1. Öffne das Haushaltsbuch-Panel.
-2. Navigiere zum Upload-Bereich.
-3. Wähle eine oder mehrere PDF-Dateien deiner ING-Kontoauszüge aus.
-4. Die Buchungen werden automatisch geparst und kategorisiert.
-
-### Kategorien verwalten
-
-Du kannst bestehende Kategorien bearbeiten, neue Kategorien erstellen und Regeln für die automatische Zuordnung anpassen.
-
----
-
-## Daten
-
-Alle Daten werden im persistenten `.data`-Verzeichnis des Add-ons gespeichert:
-
-| Pfad | Beschreibung |
-|------|-------------|
-| `.data/budget.db` | SQLite-Datenbank mit allen Buchungen und Kategorien |
-| `.data/uploads/` | Hochgeladene PDF-Kontoauszüge |
-
-Das Verzeichnis wird vom Home Assistant Supervisor automatisch verwaltet und bleibt bei Updates erhalten.
-
----
-
-## System-Anforderungen
-
-- **Home Assistant** mit Supervisor (z. B. Home Assistant OS)
-- Unterstützte Architekturen: `amd64`, `aarch64`
-
----
+2. Im Add-on Store nach **Haushaltsbuch** suchen und das Add-on **installieren**.
+3. Das Add-on **starten** und die Hinweise in der [Dokumentation](budget_tracker/DOCS.md) befolgen.
 
 ## Support
 
-Hast du eine Frage oder ein Problem?
+- [GitHub Issues][issues] – Fehler melden oder Verbesserungen vorschlagen
+- [GitHub Discussions][discussions] – Fragen stellen und Ideen teilen
 
-- **Issues**: [GitHub Issues](https://github.com/dunuld/BudgetTracker/issues) — melde Bugs oder schlage Verbesserungen vor.
-- **Diskussionen**: [GitHub Discussions](https://github.com/dunuld/BudgetTracker/discussions) — stelle Fragen oder teile Ideen.
+## Mitwirken
 
----
-
-## Changelog
-
-Siehe [CHANGELOG.md](CHANGELOG.md) für eine Übersicht aller Änderungen pro Version.
-
----
+Beiträge sind willkommen! Hinweise zur lokalen Entwicklung, zu Tests und zur Projektstruktur
+findest du in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Lizenz
 
 Dieses Projekt steht unter der [MIT-Lizenz](LICENSE).
+
+[ci-badge]: https://github.com/dunuld/BudgetTracker/actions/workflows/ci.yml/badge.svg?branch=main
+[ci-workflow]: https://github.com/dunuld/BudgetTracker/actions/workflows/ci.yml
+[quality-badge]: https://github.com/dunuld/BudgetTracker/actions/workflows/code-quality.yml/badge.svg?branch=main
+[quality-workflow]: https://github.com/dunuld/BudgetTracker/actions/workflows/code-quality.yml
+[release-badge]: https://img.shields.io/github/v/release/dunuld/BudgetTracker
+[releases]: https://github.com/dunuld/BudgetTracker/releases
+[license-badge]: https://img.shields.io/github/license/dunuld/BudgetTracker
+[arch-badge]: https://img.shields.io/badge/arch-amd64%20%7C%20aarch64-blue
+[version-badge]: https://img.shields.io/badge/dynamic/yaml?label=Version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdunuld%2FBudgetTracker%2Fmain%2Fbudget_tracker%2Fconfig.yaml
+[amd64-badge]: https://img.shields.io/badge/amd64-yes-green
+[aarch64-badge]: https://img.shields.io/badge/aarch64-yes-green
+[repo-btn]: https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg
+[repo-add]: https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fdunuld%2FBudgetTracker
+[issues]: https://github.com/dunuld/BudgetTracker/issues
+[discussions]: https://github.com/dunuld/BudgetTracker/discussions

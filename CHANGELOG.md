@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Geändert
+- **Home-Assistant-Einbettung**: Im Modus „System“ übernimmt das Panel jetzt Farben, Schrift und Hell/Dunkel des aktiven HA-Themes (auch bei Theme-Wechsel zur Laufzeit); manuelle Auswahl Hell/Dunkel hat weiterhin Vorrang
+- **Layout**: Kein weißer Rand/doppelter Scrollbalken mehr im Ingress-iframe; Navigation als fixierte, horizontal scrollbare Tab-Leiste im HA-Stil; Titel wird eingebettet ausgeblendet (steht bereits in HA)
+- **Karten-Design**: Diagramme und Tabellen in HA-ähnlichen Karten; Tabellen scrollen horizontal statt die Seite zu verbreitern
+- **Mobil / Companion-App**: Transaktionen als kompakte Liste, Formulare und Monatsauswahl auf schmale Breiten angepasst, kein Auto-Zoom bei Eingabefeldern unter iOS
+
 ### Behoben
 
 - **Regex-Regeln**: Muster wurden vor dem Abgleich in Großbuchstaben gewandelt (`\b` → `\B`), daher griffen u. a. die Standardregeln für ESSO, ARAL, NETTO, DM und LOHN nie

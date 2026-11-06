@@ -16,16 +16,22 @@ h2 {
   gap: 0.5rem;
   padding: 3rem 2rem;
   border: 2px dashed var(--bt-border-input);
-  border-radius: 8px;
+  border-radius: var(--bt-radius);
+  background: var(--bt-surface);
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
   width: 100%;
   max-width: 500px;
   color: var(--bt-text);
+  text-align: center;
 }
 
-.drop-zone:hover {
+.drop-zone:hover,
+.drop-zone:focus-within {
   border-color: var(--bt-primary);
+  background: var(--bt-hover);
 }
 
 .drop-zone .icon {
@@ -35,6 +41,9 @@ h2 {
 .file-name {
   color: var(--bt-text-secondary);
   font-size: 0.9rem;
+  text-align: center;
+  margin-top: 0.75rem;
+  overflow-wrap: anywhere;
 }
 
 .loading {
@@ -45,15 +54,16 @@ h2 {
   background: var(--bt-error-bg);
   color: var(--bt-error-text);
   padding: 0.8rem;
-  border-radius: 4px;
+  border-radius: 8px;
   margin-top: 1rem;
 }
 
 .result {
-  margin-top: 1.5rem;
+  margin: 1.5rem auto 0;
+  max-width: 600px;
   padding: 1rem;
   background: var(--bt-success-bg);
-  border-radius: 8px;
+  border-radius: var(--bt-radius);
   color: var(--bt-text);
 }
 
@@ -74,6 +84,11 @@ h2 {
   color: var(--bt-text-secondary);
 }
 
+.result dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 .warning {
   background: var(--bt-warning-bg);
   color: var(--bt-warning-text);
@@ -84,4 +99,19 @@ h2 {
 
 .warnings {
   margin-top: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .drop-zone {
+    padding: 2rem 1rem;
+  }
+
+  .result dl {
+    grid-template-columns: 1fr;
+    gap: 0 0;
+  }
+
+  .result dd {
+    margin-bottom: 0.4rem;
+  }
 }

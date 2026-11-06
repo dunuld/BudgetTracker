@@ -115,7 +115,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ needs.prepare.outputs.name }} ${{ needs.prepare.outputs.version }}
-          file: 'LICENSE'
+          files: LICENSE
           body_path: release_notes.md
           generate_release_notes: false
           draft: false

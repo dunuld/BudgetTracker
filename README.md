@@ -1,13 +1,13 @@
-# Haushaltsbuch – Home Assistant Add-on Repository
+# dunuld – Home Assistant Add-on Repository
 
 [![CI – Build & Tests][ci-badge]][ci-workflow]
 [![Code Quality][quality-badge]][quality-workflow]
-[![GitHub Release][release-badge]][releases]
 [![License][license-badge]](LICENSE)
 ![Unterstützte Architekturen][arch-badge]
 
-Home Assistant Add-on Repository für das **Haushaltsbuch**: ING-Kontoauszüge (PDF) hochladen,
-Buchungen automatisch kategorisieren und Einnahmen und Ausgaben direkt in Home Assistant auswerten.
+Home Assistant Add-on Repository mit eigenen Add-ons, u. a. dem **Haushaltsbuch**:
+ING-Kontoauszüge (PDF) hochladen, Buchungen automatisch kategorisieren und Einnahmen und Ausgaben
+direkt in Home Assistant auswerten.
 
 [![Repository zu Home Assistant hinzufügen][repo-btn]][repo-add]
 
@@ -17,13 +17,25 @@ Dieses Repository enthält folgende Add-ons:
 
 ### [Haushaltsbuch](./budget_tracker)
 
-![Version][version-badge]
+![Version][budget-tracker-version-badge]
+[![GitHub Release][budget-tracker-release-badge]][budget-tracker-releases]
 ![amd64][amd64-badge]
 ![aarch64][aarch64-badge]
 
 _Haushaltsbuch für ING-Kontoauszüge (PDF) mit automatischer Kategorisierung._
 
 [Dokumentation](budget_tracker/DOCS.md) · [Changelog](budget_tracker/CHANGELOG.md)
+
+### [Neues Add-on](./new_addon)
+
+![Version][new-addon-version-badge]
+![Stage][experimental-badge]
+![amd64][amd64-badge]
+![aarch64][aarch64-badge]
+
+_Grundgerüst für ein weiteres Add-on – noch ohne Funktion._
+
+[Dokumentation](new_addon/DOCS.md) · [Changelog](new_addon/CHANGELOG.md)
 
 ## Installation
 
@@ -37,8 +49,9 @@ _Haushaltsbuch für ING-Kontoauszüge (PDF) mit automatischer Kategorisierung._
       https://github.com/dunuld/BudgetTracker
       ```
 
-2. Im Add-on Store nach **Haushaltsbuch** suchen und das Add-on **installieren**.
-3. Das Add-on **starten** und die Hinweise in der [Dokumentation](budget_tracker/DOCS.md) befolgen.
+2. Im Add-on Store nach dem gewünschten Add-on (z. B. **Haushaltsbuch**) suchen und es
+   **installieren**.
+3. Das Add-on **starten** und die Hinweise in seiner Dokumentation befolgen.
 
 ## Support
 
@@ -58,11 +71,13 @@ Dieses Projekt steht unter der [MIT-Lizenz](LICENSE).
 [ci-workflow]: https://github.com/dunuld/BudgetTracker/actions/workflows/ci.yml
 [quality-badge]: https://github.com/dunuld/BudgetTracker/actions/workflows/code-quality.yml/badge.svg?branch=main
 [quality-workflow]: https://github.com/dunuld/BudgetTracker/actions/workflows/code-quality.yml
-[release-badge]: https://img.shields.io/github/v/release/dunuld/BudgetTracker
-[releases]: https://github.com/dunuld/BudgetTracker/releases
 [license-badge]: https://img.shields.io/github/license/dunuld/BudgetTracker
 [arch-badge]: https://img.shields.io/badge/arch-amd64%20%7C%20aarch64-blue
-[version-badge]: https://img.shields.io/badge/dynamic/yaml?label=Version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdunuld%2FBudgetTracker%2Fmain%2Fbudget_tracker%2Fconfig.yaml
+[budget-tracker-version-badge]: https://img.shields.io/badge/dynamic/yaml?label=Version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdunuld%2FBudgetTracker%2Fmain%2Fbudget_tracker%2Fconfig.yaml
+[budget-tracker-release-badge]: https://img.shields.io/github/v/release/dunuld/BudgetTracker?filter=budget_tracker-v*&label=Release
+[budget-tracker-releases]: https://github.com/dunuld/BudgetTracker/releases?q=budget_tracker-v&expanded=true
+[new-addon-version-badge]: https://img.shields.io/badge/dynamic/yaml?label=Version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdunuld%2FBudgetTracker%2Fmain%2Fnew_addon%2Fconfig.yaml
+[experimental-badge]: https://img.shields.io/badge/stage-experimental-orange
 [amd64-badge]: https://img.shields.io/badge/amd64-yes-green
 [aarch64-badge]: https://img.shields.io/badge/aarch64-yes-green
 [repo-btn]: https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg

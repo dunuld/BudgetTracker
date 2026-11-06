@@ -1,17 +1,26 @@
-<nav class="app-nav">
-  <div class="nav-brand">Haushaltsbuch</div>
-  <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-    >Übersicht</a
-  >
-  <a routerLink="transactions" routerLinkActive="active">Transaktionen</a>
-  <a routerLink="trend" routerLinkActive="active">Verlauf</a>
-  <a routerLink="upload" routerLinkActive="active">Upload</a>
-  <a routerLink="settings" routerLinkActive="active">Einstellungen</a>
-  <div class="nav-spacer"></div>
-  <button class="theme-toggle" (click)="themeService.toggle()" [title]="themeTitle()" type="button">
-    {{ themeLabel() }}
-  </button>
-</nav>
+<header class="app-header">
+  <nav class="app-nav" aria-label="Hauptnavigation">
+    <div class="nav-brand">Haushaltsbuch</div>
+    <div class="nav-links">
+      <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+        >Übersicht</a
+      >
+      <a routerLink="transactions" routerLinkActive="active">Transaktionen</a>
+      <a routerLink="trend" routerLinkActive="active">Verlauf</a>
+      <a routerLink="upload" routerLinkActive="active">Upload</a>
+      <a routerLink="settings" routerLinkActive="active">Einstellungen</a>
+    </div>
+    <button
+      class="theme-toggle"
+      (click)="themeService.toggle()"
+      [title]="themeTitle()"
+      [attr.aria-label]="themeTitle()"
+      type="button"
+    >
+      {{ themeLabel() }}
+    </button>
+  </nav>
+</header>
 <main class="app-main">
   <router-outlet></router-outlet>
 </main>

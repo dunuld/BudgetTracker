@@ -8,14 +8,16 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
+import { THEME_CHANGE_EVENT } from '../core/theme.service.js';
 
 Chart.register(...registerables);
 
-function getThemeColors(): { textColor: string; gridColor: string } {
+function getThemeColors(): { textColor: string; gridColor: string; fontFamily: string } {
   const styles = getComputedStyle(document.documentElement);
   return {
     textColor: styles.getPropertyValue('--bt-chart-text').trim() || '#666',
     gridColor: styles.getPropertyValue('--bt-chart-grid').trim() || 'rgba(0,0,0,0.1)',
+    fontFamily: styles.getPropertyValue('--bt-font-family').trim(),
   };
 }
 
@@ -24,6 +26,10 @@ function getThemeColors(): { textColor: string; gridColor: string } {
   standalone: true,
   template: `<canvas #canvas></canvas>`,
   styles: `
+    :host {
+      display: block;
+      position: relative;
+    }
     canvas {
       max-width: 100%;
     }
@@ -37,8 +43,11 @@ export default class ChartComponent implements OnDestroy {
 
   @ViewChild('canvas') canvasEl?: ElementRef<HTMLCanvasElement>;
   private chart: Chart | null = null;
+  // Farben neu einlesen, wenn Hell/Dunkel oder das HA-Theme wechselt
+  private readonly onThemeChange = () => this.render();
 
   constructor() {
+    window.addEventListener(THEME_CHANGE_EVENT, this.onThemeChange);
     effect(() => {
       this.render();
     });
@@ -48,6 +57,7 @@ export default class ChartComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    window.removeEventListener(THEME_CHANGE_EVENT, this.onThemeChange);
     this.chart?.destroy();
   }
 
@@ -67,6 +77,7 @@ export default class ChartComponent implements OnDestroy {
     }));
 
     const theme = getThemeColors();
+    if (theme.fontFamily) Chart.defaults.font.family = theme.fontFamily;
 
     const options: Record<string, unknown> = {
       responsive: true,

@@ -53,38 +53,40 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
         </div>
 
         @if (categories().length > 0) {
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Farbe</th>
-                <th>Typ</th>
-                <th>Aktionen</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (cat of categories(); track cat.id) {
+          <div class="bt-card table-scroll">
+            <table>
+              <thead>
                 <tr>
-                  <td>
-                    <span class="color-dot" [style.background]="cat.color"></span>
-                    {{ cat.name }}
-                    @if (cat.isDefault) {
-                      <span class="badge">Standard</span>
-                    }
-                  </td>
-                  <td>
-                    <code>{{ cat.color }}</code>
-                  </td>
-                  <td>{{ kindLabel(cat.kind) }}</td>
-                  <td>
-                    @if (!cat.isDefault) {
-                      <button class="btn-danger" (click)="deleteCategory(cat.id)">Löschen</button>
-                    }
-                  </td>
+                  <th>Name</th>
+                  <th>Farbe</th>
+                  <th>Typ</th>
+                  <th>Aktionen</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (cat of categories(); track cat.id) {
+                  <tr>
+                    <td>
+                      <span class="color-dot" [style.background]="cat.color"></span>
+                      {{ cat.name }}
+                      @if (cat.isDefault) {
+                        <span class="badge">Standard</span>
+                      }
+                    </td>
+                    <td>
+                      <code>{{ cat.color }}</code>
+                    </td>
+                    <td>{{ kindLabel(cat.kind) }}</td>
+                    <td>
+                      @if (!cat.isDefault) {
+                        <button class="btn-danger" (click)="deleteCategory(cat.id)">Löschen</button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         }
       </div>
     }
@@ -121,34 +123,36 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
         </div>
 
         @if (rules().length > 0) {
-          <table>
-            <thead>
-              <tr>
-                <th>Kategorie</th>
-                <th>Feld</th>
-                <th>Typ</th>
-                <th>Muster</th>
-                <th>Priorität</th>
-                <th>Aktionen</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (rule of rules(); track rule.id) {
+          <div class="bt-card table-scroll">
+            <table>
+              <thead>
                 <tr>
-                  <td>{{ categoryName(rule.categoryId) }}</td>
-                  <td>{{ fieldLabel(rule.field) }}</td>
-                  <td>{{ rule.matchType }}</td>
-                  <td>
-                    <code>{{ rule.pattern }}</code>
-                  </td>
-                  <td>{{ rule.priority }}</td>
-                  <td>
-                    <button class="btn-danger" (click)="deleteRule(rule.id)">Löschen</button>
-                  </td>
+                  <th>Kategorie</th>
+                  <th>Feld</th>
+                  <th>Typ</th>
+                  <th>Muster</th>
+                  <th>Priorität</th>
+                  <th>Aktionen</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (rule of rules(); track rule.id) {
+                  <tr>
+                    <td>{{ categoryName(rule.categoryId) }}</td>
+                    <td>{{ fieldLabel(rule.field) }}</td>
+                    <td>{{ rule.matchType }}</td>
+                    <td>
+                      <code>{{ rule.pattern }}</code>
+                    </td>
+                    <td>{{ rule.priority }}</td>
+                    <td>
+                      <button class="btn-danger" (click)="deleteRule(rule.id)">Löschen</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         }
       </div>
     }
@@ -156,32 +160,34 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
     @if (activeTab() === 'statements') {
       <div class="tab-content">
         @if (statements().length > 0) {
-          <table>
-            <thead>
-              <tr>
-                <th>Monat</th>
-                <th>IBAN</th>
-                <th>Buchungen</th>
-                <th>Importiert</th>
-                <th>Aktionen</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (s of statements(); track s.id) {
+          <div class="bt-card table-scroll">
+            <table>
+              <thead>
                 <tr>
-                  <td>{{ monthYearLabel(s.year, s.month) }}</td>
-                  <td>
-                    <code>{{ s.iban }}</code>
-                  </td>
-                  <td>{{ s.transactionCount }}</td>
-                  <td>{{ formatDate(s.importedAt) }}</td>
-                  <td>
-                    <button class="btn-danger" (click)="deleteStatement(s.id)">Löschen</button>
-                  </td>
+                  <th>Monat</th>
+                  <th>IBAN</th>
+                  <th>Buchungen</th>
+                  <th>Importiert</th>
+                  <th>Aktionen</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (s of statements(); track s.id) {
+                  <tr>
+                    <td>{{ monthYearLabel(s.year, s.month) }}</td>
+                    <td>
+                      <code>{{ s.iban }}</code>
+                    </td>
+                    <td>{{ s.transactionCount }}</td>
+                    <td>{{ formatDate(s.importedAt) }}</td>
+                    <td>
+                      <button class="btn-danger" (click)="deleteStatement(s.id)">Löschen</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         } @else {
           <p class="empty">Noch keine Auszüge importiert.</p>
         }
@@ -195,24 +201,33 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
   styles: `
     .tabs {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.25rem;
       margin-bottom: 1.5rem;
-      border-bottom: 2px solid var(--bt-border);
+      border-bottom: 1px solid var(--bt-border);
+      overflow-x: auto;
+      scrollbar-width: none;
     }
     .tab {
+      flex: none;
       background: none;
       border: none;
-      padding: 0.5rem 1rem;
+      padding: 0 1rem;
+      height: 40px;
       cursor: pointer;
       font-size: 0.95rem;
+      font-weight: 500;
       color: var(--bt-text-secondary);
       border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
+      margin-bottom: -1px;
+      white-space: nowrap;
+    }
+    .tab:hover {
+      color: var(--bt-text);
+      background: var(--bt-hover);
     }
     .tab.active {
-      color: var(--ha-primary-color, var(--bt-primary));
-      border-bottom-color: var(--ha-primary-color, var(--bt-primary));
-      font-weight: 600;
+      color: var(--bt-primary);
+      border-bottom-color: var(--bt-primary);
     }
 
     .tab-content {
@@ -227,36 +242,41 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
       align-items: center;
     }
     .input {
-      padding: 0.4rem 0.6rem;
+      height: 36px;
+      padding: 0 0.6rem;
       border: 1px solid var(--bt-border-input);
-      border-radius: 4px;
+      border-radius: 8px;
       font-size: 0.9rem;
       color: var(--bt-text);
-      background: var(--bt-bg);
+      background: var(--bt-surface);
     }
     .color-input {
-      width: 40px;
-      height: 32px;
+      width: 44px;
+      height: 36px;
       padding: 2px;
       border: 1px solid var(--bt-border-input);
-      border-radius: 4px;
+      border-radius: 8px;
+      background: var(--bt-surface);
       cursor: pointer;
     }
     .btn-primary {
-      background: var(--ha-primary-color, var(--bt-primary));
-      color: white;
+      background: var(--bt-primary);
+      color: var(--bt-text-on-primary);
       border: none;
-      border-radius: 4px;
-      padding: 0.4rem 1rem;
+      border-radius: 8px;
+      height: 36px;
+      padding: 0 1rem;
       cursor: pointer;
       font-size: 0.9rem;
+      font-weight: 500;
     }
     .btn-secondary {
       background: var(--bt-bg-tertiary);
       color: var(--bt-text);
       border: none;
-      border-radius: 4px;
-      padding: 0.4rem 1rem;
+      border-radius: 8px;
+      height: 36px;
+      padding: 0 1rem;
       cursor: pointer;
       font-size: 0.9rem;
       margin-bottom: 1rem;
@@ -269,7 +289,7 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
       background: #f44336;
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       padding: 0.3rem 0.6rem;
       cursor: pointer;
       font-size: 0.85rem;
@@ -278,7 +298,9 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 1rem;
+    }
+    td {
+      overflow-wrap: anywhere;
     }
     th,
     td {
@@ -331,6 +353,26 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
       color: var(--bt-text-muted);
       text-align: center;
       padding: 2rem;
+    }
+
+    @media (max-width: 600px) {
+      .tabs {
+        margin-bottom: 1rem;
+      }
+      .tab {
+        padding: 0 0.75rem;
+      }
+      .form-row .input {
+        flex: 1 1 140px;
+        min-width: 0;
+      }
+      .form-row .btn-primary {
+        flex: 1 1 100%;
+      }
+      th,
+      td {
+        padding: 0.5rem 0.6rem;
+      }
     }
   `,
 })

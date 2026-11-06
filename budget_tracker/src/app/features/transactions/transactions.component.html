@@ -2,12 +2,16 @@
 
 <div class="filters">
   <div class="month-selector">
-    <button class="btn-icon" (click)="prevMonth()">◀</button>
-    <span>{{ monthLabel() }}</span>
-    <button class="btn-icon" (click)="nextMonth()">▶</button>
+    <button class="btn-icon" (click)="prevMonth()" aria-label="Vorheriger Monat">‹</button>
+    <span class="month-label">{{ monthLabel() }}</span>
+    <button class="btn-icon" (click)="nextMonth()" aria-label="Nächster Monat">›</button>
   </div>
 
-  <select (change)="onFilterCategoryChange($event)">
+  <select
+    class="category-filter"
+    (change)="onFilterCategoryChange($event)"
+    aria-label="Kategorie filtern"
+  >
     <option value="" [selected]="categoryId() === null">Alle Kategorien</option>
     @for (c of categories(); track c.id) {
       <option [value]="c.id" [selected]="c.id === categoryId()">{{ c.name }}</option>
@@ -31,45 +35,51 @@
 }
 
 @if (!loading() && transactions().length) {
-  <table>
-    <thead>
-      <tr>
-        <th>Datum</th>
-        <th>Art</th>
-        <th>Empfänger</th>
-        <th>Verwendungszweck</th>
-        <th>Betrag</th>
-        <th>Kategorie</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (tx of transactions(); track tx) {
+  <div class="bt-card table-scroll tx-card">
+    <table class="tx-table">
+      <thead>
         <tr>
-          <td>{{ tx.bookingDate | date: 'dd.MM.yyyy' }}</td>
-          <td>{{ tx.type }}</td>
-          <td>{{ tx.counterparty }}</td>
-          <td class="purpose">{{ tx.purpose }}</td>
-          <td class="amount" [class.positive]="tx.amountCents > 0">
-            {{ formatEuro(tx.amountCents) }}
-          </td>
-          <td>
-            <select (change)="onCategoryChange(tx, $event)">
-              <option value="" disabled [selected]="tx.categoryId === null">
-                — unkategorisiert —
-              </option>
-              @for (c of categories(); track c.id) {
-                <option [value]="c.id" [style.color]="c.color" [selected]="c.id === tx.categoryId">
-                  {{ c.name }}
-                </option>
-              }
-            </select>
-          </td>
+          <th>Datum</th>
+          <th class="type">Art</th>
+          <th>Empfänger</th>
+          <th class="purpose">Verwendungszweck</th>
+          <th class="amount">Betrag</th>
+          <th>Kategorie</th>
         </tr>
-      }
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        @for (tx of transactions(); track tx) {
+          <tr>
+            <td class="date">{{ tx.bookingDate | date: 'dd.MM.yyyy' }}</td>
+            <td class="type">{{ tx.type }}</td>
+            <td class="counterparty">{{ tx.counterparty }}</td>
+            <td class="purpose" [title]="tx.purpose">{{ tx.purpose }}</td>
+            <td class="amount" [class.positive]="tx.amountCents > 0">
+              {{ formatEuro(tx.amountCents) }}
+            </td>
+            <td class="category">
+              <select (change)="onCategoryChange(tx, $event)" aria-label="Kategorie">
+                <option value="" disabled [selected]="tx.categoryId === null">
+                  — unkategorisiert —
+                </option>
+                @for (c of categories(); track c.id) {
+                  <option
+                    [value]="c.id"
+                    [style.color]="c.color"
+                    [selected]="c.id === tx.categoryId"
+                  >
+                    {{ c.name }}
+                  </option>
+                }
+              </select>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 }
 
 @if (!loading() && !transactions().length && !error()) {
-  <p>Keine Transaktionen gefunden.</p>
+  <p class="empty">Keine Transaktionen gefunden.</p>
 }

@@ -27,7 +27,7 @@ import type { TrendMonth, TrendReport } from '../../../../shared/api-types';
       <p class="loading">Lade Daten …</p>
     } @else if (report()) {
       @if (chartDatasets().length > 0) {
-        <div class="chart-section">
+        <div class="chart-section bt-card">
           <app-chart
             [type]="'bar'"
             [labels]="report()!.months.map((m) => formatMonthLabel(m.month))"
@@ -37,7 +37,7 @@ import type { TrendMonth, TrendReport } from '../../../../shared/api-types';
         </div>
       }
 
-      <div class="trend-table">
+      <div class="trend-table bt-card table-scroll">
         <table>
           <thead>
             <tr>
@@ -80,12 +80,23 @@ import type { TrendMonth, TrendReport } from '../../../../shared/api-types';
       gap: 0.5rem;
       font-size: 0.9rem;
     }
+    .range-selector input {
+      height: 36px;
+      padding: 0 0.5rem;
+      border: 1px solid var(--bt-border-input);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: var(--bt-text);
+      background: var(--bt-surface);
+    }
     .btn-primary {
-      background: var(--ha-primary-color, var(--bt-primary));
-      color: white;
+      background: var(--bt-primary);
+      color: var(--bt-text-on-primary);
       border: none;
-      border-radius: 4px;
-      padding: 0.4rem 1rem;
+      border-radius: 8px;
+      height: 36px;
+      padding: 0 1rem;
+      font-weight: 500;
       cursor: pointer;
       font-size: 0.9rem;
     }
@@ -94,14 +105,6 @@ import type { TrendMonth, TrendReport } from '../../../../shared/api-types';
       cursor: default;
     }
 
-    .chart-section {
-      margin-bottom: 2rem;
-    }
-
-    .trend-table {
-      margin-bottom: 1rem;
-      overflow-x: auto;
-    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -121,6 +124,15 @@ import type { TrendMonth, TrendReport } from '../../../../shared/api-types';
     }
     .text-right {
       text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    td:first-child,
+    th:first-child {
+      position: sticky;
+      left: 0;
+      background: var(--bt-surface);
+      white-space: nowrap;
     }
     .color-dot {
       display: inline-block;
@@ -136,6 +148,26 @@ import type { TrendMonth, TrendReport } from '../../../../shared/api-types';
       color: var(--bt-text-muted);
       text-align: center;
       padding: 2rem;
+    }
+
+    @media (max-width: 600px) {
+      .range-selector {
+        gap: 0.5rem;
+      }
+      .range-selector label {
+        flex: 1 1 140px;
+      }
+      .range-selector input {
+        flex: 1;
+        min-width: 0;
+      }
+      .btn-primary {
+        flex: 1 1 100%;
+      }
+      th,
+      td {
+        padding: 0.5rem 0.6rem;
+      }
     }
   `,
 })

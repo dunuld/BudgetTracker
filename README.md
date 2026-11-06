@@ -46,7 +46,7 @@ _Grundgerüst für ein weiteres Add-on – noch ohne Funktion._
    3. Folgende URL eintragen und **Hinzufügen** klicken:
 
       ```
-      https://github.com/dunuld/Tracker-Addons
+      https://github.com/dunuld/hassio-addons
       ```
 
 2. Im Add-on Store nach dem gewünschten Add-on (z. B. **Haushaltsbuch**) suchen und es
@@ -67,20 +67,20 @@ findest du in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Dieses Projekt steht unter der [MIT-Lizenz](LICENSE).
 
-[ci-badge]: https://github.com/dunuld/Tracker-Addons/actions/workflows/ci.yml/badge.svg?branch=main
-[ci-workflow]: https://github.com/dunuld/Tracker-Addons/actions/workflows/ci.yml
-[quality-badge]: https://github.com/dunuld/Tracker-Addons/actions/workflows/code-quality.yml/badge.svg?branch=main
-[quality-workflow]: https://github.com/dunuld/Tracker-Addons/actions/workflows/code-quality.yml
-[license-badge]: https://img.shields.io/github/license/dunuld/Tracker-Addons
+[ci-badge]: https://github.com/dunuld/hassio-addons/actions/workflows/ci.yml/badge.svg?branch=main
+[ci-workflow]: https://github.com/dunuld/hassio-addons/actions/workflows/ci.yml
+[quality-badge]: https://github.com/dunuld/hassio-addons/actions/workflows/code-quality.yml/badge.svg?branch=main
+[quality-workflow]: https://github.com/dunuld/hassio-addons/actions/workflows/code-quality.yml
+[license-badge]: https://img.shields.io/github/license/dunuld/hassio-addons
 [arch-badge]: https://img.shields.io/badge/arch-amd64%20%7C%20aarch64-blue
-[budget-tracker-version-badge]: https://img.shields.io/badge/dynamic/yaml?label=Version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdunuld%2FTracker-Addons%2Fmain%2Fbudget_tracker%2Fconfig.yaml
-[budget-tracker-release-badge]: https://img.shields.io/github/v/release/dunuld/Tracker-Addons?filter=budget_tracker-v*&label=Release
-[budget-tracker-releases]: https://github.com/dunuld/Tracker-Addons/releases?q=budget_tracker-v&expanded=true
-[new-addon-version-badge]: https://img.shields.io/badge/dynamic/yaml?label=Version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdunuld%2FTracker-Addons%2Fmain%2Fnew_addon%2Fconfig.yaml
+[budget-tracker-version-badge]: https://img.shields.io/badge/dynamic/yaml?label=Version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdunuld%2Fhassio-addons%2Fmain%2Fbudget_tracker%2Fconfig.yaml
+[budget-tracker-release-badge]: https://img.shields.io/github/v/release/dunuld/hassio-addons?filter=budget_tracker-v*&label=Release
+[budget-tracker-releases]: https://github.com/dunuld/hassio-addons/releases?q=budget_tracker-v&expanded=true
+[new-addon-version-badge]: https://img.shields.io/badge/dynamic/yaml?label=Version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdunuld%2Fhassio-addons%2Fmain%2Fnew_addon%2Fconfig.yaml
 [experimental-badge]: https://img.shields.io/badge/stage-experimental-orange
 [amd64-badge]: https://img.shields.io/badge/amd64-yes-green
 [aarch64-badge]: https://img.shields.io/badge/aarch64-yes-green
 [repo-btn]: https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg
-[repo-add]: https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fdunuld%2FTracker-Addons
-[issues]: https://github.com/dunuld/Tracker-Addons/issues
-[discussions]: https://github.com/dunuld/Tracker-Addons/discussions
+[repo-add]: https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fdunuld%2Fhassio-addons
+[issues]: https://github.com/dunuld/hassio-addons/issues
+[discussions]: https://github.com/dunuld/hassio-addons/discussions

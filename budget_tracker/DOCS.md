@@ -9,7 +9,7 @@ Diagramme dargestellt.
 Die Installation dieses Add-ons ist einfach und unterscheidet sich nicht von anderen
 Home Assistant Add-ons:
 
-1. Das Repository `https://github.com/dunuld/Tracker-Addons` im Add-on Store hinzufügen
+1. Das Repository `https://github.com/dunuld/hassio-addons` im Add-on Store hinzufügen
    (**Einstellungen → Add-ons → Add-on Store → ⋮ → Repositories**).
 2. Im Add-on Store nach **Haushaltsbuch** suchen und auf **Installieren** klicken.
 3. Das Add-on **starten**.
@@ -91,11 +91,11 @@ Add-ons enthalten.
 
 Hast du Fragen oder ein Problem gefunden?
 
-- [GitHub Issues](https://github.com/dunuld/Tracker-Addons/issues) – Fehler melden oder
+- [GitHub Issues](https://github.com/dunuld/hassio-addons/issues) – Fehler melden oder
   Verbesserungen vorschlagen
-- [GitHub Discussions](https://github.com/dunuld/Tracker-Addons/discussions) – Fragen stellen und
+- [GitHub Discussions](https://github.com/dunuld/hassio-addons/discussions) – Fragen stellen und
   Ideen teilen
 
 ## Lizenz
 
-MIT – siehe [LICENSE](https://github.com/dunuld/Tracker-Addons/blob/main/LICENSE).
+MIT – siehe [LICENSE](https://github.com/dunuld/hassio-addons/blob/main/LICENSE).

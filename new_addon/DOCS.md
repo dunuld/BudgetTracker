@@ -5,7 +5,7 @@ ob das Backend erreichbar ist.
 
 ## Installation
 
-1. Das Repository `https://github.com/dunuld/Tracker-Addons` im Add-on Store hinzufügen
+1. Das Repository `https://github.com/dunuld/hassio-addons` im Add-on Store hinzufügen
    (**Einstellungen → Add-ons → Add-on Store → ⋮ → Repositories**).
 2. Im Add-on Store nach **Neues Add-on** suchen und auf **Installieren** klicken.
    Da das Add-on als _experimentell_ markiert ist, wird es nur im erweiterten Modus angezeigt.
@@ -36,11 +36,11 @@ wird, bei Updates erhalten bleibt und in Home-Assistant-Backups des Add-ons enth
 
 Hast du Fragen oder ein Problem gefunden?
 
-- [GitHub Issues](https://github.com/dunuld/Tracker-Addons/issues) – Fehler melden oder
+- [GitHub Issues](https://github.com/dunuld/hassio-addons/issues) – Fehler melden oder
   Verbesserungen vorschlagen
-- [GitHub Discussions](https://github.com/dunuld/Tracker-Addons/discussions) – Fragen stellen und
+- [GitHub Discussions](https://github.com/dunuld/hassio-addons/discussions) – Fragen stellen und
   Ideen teilen
 
 ## Lizenz
 
-MIT – siehe [LICENSE](https://github.com/dunuld/Tracker-Addons/blob/main/LICENSE).
+MIT – siehe [LICENSE](https://github.com/dunuld/hassio-addons/blob/main/LICENSE).

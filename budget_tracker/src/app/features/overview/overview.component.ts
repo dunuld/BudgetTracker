@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../core/api.service.js';
 import { formatEuro as fmtEuro, formatMonthYear as fmtMonthYear } from '../../core/format.js';
@@ -218,7 +218,7 @@ import type { MonthlyReport } from '../../../../shared/api-types';
   `,
 })
 export default class OverviewComponent {
-  private readonly api = new ApiService();
+  private readonly api = inject(ApiService);
 
   readonly currentYear = signal(new Date().getFullYear());
   readonly currentMonth = signal(new Date().getMonth() + 1);

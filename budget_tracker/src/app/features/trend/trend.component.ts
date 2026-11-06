@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, inject } from '@angular/core';
 import { ApiService } from '../../core/api.service.js';
 import { formatMonthYear as fmtMonthYear } from '../../core/format.js';
 import ChartComponent from '../../shared/chart.component.js';
@@ -140,7 +140,7 @@ import type { TrendMonth, TrendReport } from '../../../../shared/api-types';
   `,
 })
 export default class TrendComponent {
-  private readonly api = new ApiService();
+  private readonly api = inject(ApiService);
 
   readonly fromMonth = signal(this.defaultFrom());
   readonly toMonth = signal(this.defaultTo());
@@ -228,7 +228,6 @@ export default class TrendComponent {
   formatEuroTick(value: number): string {
     if (value === 0) return '0 €';
     if (value >= 100000) return `${(value / 100000).toFixed(1)}k €`;
-    if (value >= 10000) return `${(value / 100).toFixed(0)} €`;
     return `${(value / 100).toFixed(0)} €`;
   }
 
@@ -238,13 +237,19 @@ export default class TrendComponent {
   }
 
   private defaultFrom(): string {
-    const d = new Date();
-    d.setMonth(d.getMonth() - 5);
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    // Über Jahr/Monat rechnen: setMonth(-5) läuft am 29.–31. in den Folgemonat über.
+    const now = new Date();
+    const index = now.getFullYear() * 12 + now.getMonth() - 5;
+    return yearMonth(Math.floor(index / 12), index % 12);
   }
 
   private defaultTo(): string {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const now = new Date();
+    return yearMonth(now.getFullYear(), now.getMonth());
   }
+}
+
+/** `YYYY-MM` aus Jahr und 0-basiertem Monat. */
+function yearMonth(year: number, monthIndex: number): string {
+  return `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
 }

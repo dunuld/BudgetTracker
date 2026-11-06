@@ -322,4 +322,275 @@ describe('SettingsComponent', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.badge')?.textContent).toContain('Standard');
   });
+
+  describe('Aktionen', () => {
+    type Fixture = ReturnType<typeof TestBed.createComponent<SettingsComponent>>;
+
+    /** Komponente erzeugen und die drei Initial-Requests beantworten. */
+    async function setup(): Promise<{ fixture: Fixture; component: SettingsComponent }> {
+      const fixture = TestBed.createComponent(SettingsComponent);
+      fixture.detectChanges();
+      httpMock.expectOne('api/categories').flush(createMockCategories());
+      httpMock.expectOne('api/rules').flush(createMockRules());
+      httpMock.expectOne('api/statements').flush(createMockStatements());
+      await fixture.whenStable();
+      fixture.detectChanges();
+      return { fixture, component: fixture.componentInstance };
+    }
+
+    const input = (value: string) => Object.assign(document.createElement('input'), { value });
+    /** Select mit genau einer Option, damit `value` gesetzt werden kann. */
+    const select = (value: string) => {
+      const el = document.createElement('select');
+      el.append(new Option(value, value));
+      el.value = value;
+      return el;
+    };
+    const serverError = (status: number) => ({ status, statusText: 'Error' });
+
+    afterEach(() => vi.restoreAllMocks());
+
+    describe('Kategorien', () => {
+      it('legt eine Kategorie an und leert das Namensfeld', async () => {
+        const { component } = await setup();
+        const name = input('  Hobby ');
+
+        component.addCategory(name, input('#123abc'), select('income'));
+        const req = httpMock.expectOne('api/categories');
+        expect(req.request.method).toBe('POST');
+        expect(req.request.body).toEqual({ name: 'Hobby', color: '#123abc', kind: 'income' });
+        req.flush({
+          id: 9,
+          name: 'Hobby',
+          color: '#123abc',
+          kind: 'income',
+          sort: 0,
+          isDefault: false,
+        });
+
+        expect(component.categories().map((c) => c.name)).toContain('Hobby');
+        expect(name.value).toBe('');
+      });
+
+      it('sendet keinen Request bei leerem Namen', async () => {
+        const { component } = await setup();
+        component.addCategory(input('   '), input('#000000'), select('expense'));
+        httpMock.expectNone('api/categories');
+      });
+
+      it('zeigt die Server-Meldung bei Fehlern an (z. B. doppelter Name)', async () => {
+        const { fixture, component } = await setup();
+        component.addCategory(input('Miete'), input('#000000'), select('expense'));
+        httpMock
+          .expectOne('api/categories')
+          .flush(
+            { error: 'Eine Kategorie mit diesem Namen existiert bereits', code: 'NAME_EXISTS' },
+            serverError(409),
+          );
+
+        expect(component.errorMsg()).toBe('Eine Kategorie mit diesem Namen existiert bereits');
+        fixture.detectChanges();
+        expect(
+          (fixture.nativeElement as HTMLElement).querySelector('.error-msg')?.textContent,
+        ).toContain('existiert bereits');
+        expect(component.categories()).toHaveLength(3);
+      });
+
+      it('nutzt eine Standardmeldung, wenn der Server keine liefert', async () => {
+        const { component } = await setup();
+        component.addCategory(input('X'), input('#000000'), select('expense'));
+        httpMock.expectOne('api/categories').error(new ProgressEvent('error'));
+        expect(component.errorMsg()).toBe('Fehler beim Erstellen');
+      });
+
+      it('löscht nach Bestätigung über den Button und lädt die Regeln neu', async () => {
+        const { fixture, component } = await setup();
+        const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+        // Erster Löschen-Button gehört zu "Lebensmittel" (id 1); Standardkategorie hat keinen
+        const buttons = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+          '.btn-danger',
+        );
+        expect(buttons).toHaveLength(2);
+        buttons[0]!.click();
+
+        expect(confirmSpy).toHaveBeenCalled();
+        const req = httpMock.expectOne('api/categories/1');
+        expect(req.request.method).toBe('DELETE');
+        req.flush(null);
+        httpMock.expectOne('api/rules').flush([createMockRules()[1]]);
+
+        expect(component.categories().map((c) => c.id)).toEqual([2, 4]);
+        expect(component.rules()).toHaveLength(1);
+      });
+
+      it('löscht nicht ohne Bestätigung', async () => {
+        const { component } = await setup();
+        vi.spyOn(window, 'confirm').mockReturnValue(false);
+        component.deleteCategory(1);
+        httpMock.expectNone('api/categories/1');
+        expect(component.categories()).toHaveLength(3);
+      });
+
+      it('zeigt Fehler beim Löschen an', async () => {
+        const { component } = await setup();
+        vi.spyOn(window, 'confirm').mockReturnValue(true);
+        component.deleteCategory(4);
+        httpMock
+          .expectOne('api/categories/4')
+          .flush({ error: 'Die Standardkategorie kann nicht gelöscht werden' }, serverError(409));
+        expect(component.errorMsg()).toContain('Standardkategorie');
+        expect(component.categories()).toHaveLength(3);
+      });
+    });
+
+    describe('Regeln', () => {
+      it('legt eine Regel an', async () => {
+        const { component } = await setup();
+        const pattern = input(' NETFLIX ');
+
+        component.addRule(select('2'), select('purpose'), select('regex'), pattern);
+        const req = httpMock.expectOne('api/rules');
+        expect(req.request.method).toBe('POST');
+        expect(req.request.body).toEqual({
+          categoryId: 2,
+          field: 'purpose',
+          matchType: 'regex',
+          pattern: 'NETFLIX',
+        });
+        req.flush({
+          id: 3,
+          categoryId: 2,
+          field: 'purpose',
+          matchType: 'regex',
+          pattern: 'NETFLIX',
+          priority: 100,
+        });
+
+        expect(component.rules()).toHaveLength(3);
+        expect(pattern.value).toBe('');
+      });
+
+      it.each([
+        ['ohne Kategorie', '', 'X'],
+        ['ohne Muster', '1', '  '],
+      ])('sendet keinen Request %s', async (_label, cat, pat) => {
+        const { component } = await setup();
+        component.addRule(select(cat), select('any'), select('contains'), input(pat));
+        httpMock.expectNone('api/rules');
+      });
+
+      it('zeigt Validierungsfehler des Servers an', async () => {
+        const { component } = await setup();
+        component.addRule(select('1'), select('any'), select('regex'), input('('));
+        httpMock
+          .expectOne('api/rules')
+          .flush({ error: 'Ungültiges Regex-Muster' }, serverError(400));
+        expect(component.errorMsg()).toBe('Ungültiges Regex-Muster');
+      });
+
+      it('löscht eine Regel über den Button im Regel-Tab', async () => {
+        const { fixture, component } = await setup();
+        component.activeTab.set('rules');
+        fixture.detectChanges();
+
+        (fixture.nativeElement as HTMLElement)
+          .querySelector<HTMLButtonElement>('.btn-danger')!
+          .click();
+        const req = httpMock.expectOne('api/rules/1');
+        expect(req.request.method).toBe('DELETE');
+        req.flush(null);
+        expect(component.rules().map((r) => r.id)).toEqual([2]);
+      });
+
+      it('zeigt Fehler beim Löschen einer Regel an', async () => {
+        const { component } = await setup();
+        component.deleteRule(1);
+        httpMock.expectOne('api/rules/1').error(new ProgressEvent('error'));
+        expect(component.errorMsg()).toBe('Fehler beim Löschen');
+        expect(component.rules()).toHaveLength(2);
+      });
+
+      it('wendet Regeln neu an und zeigt Fortschritt und Ergebnis', async () => {
+        const { fixture, component } = await setup();
+        component.activeTab.set('rules');
+        fixture.detectChanges();
+        const el = fixture.nativeElement as HTMLElement;
+        const button = el.querySelector<HTMLButtonElement>('.btn-secondary')!;
+
+        button.click();
+        fixture.detectChanges();
+        expect(component.reapplying()).toBe(true);
+        expect(button.disabled).toBe(true);
+        expect(button.textContent).toContain('Wende an');
+
+        const req = httpMock.expectOne('api/rules/reapply');
+        expect(req.request.method).toBe('POST');
+        req.flush({ updated: 7 });
+        fixture.detectChanges();
+
+        expect(component.reapplying()).toBe(false);
+        expect(el.querySelector('.success-msg')?.textContent).toContain('7 Buchungen aktualisiert');
+      });
+
+      it('setzt den Fortschritt auch bei Fehlern zurück', async () => {
+        const { component } = await setup();
+        component.reapplyRules();
+        httpMock.expectOne('api/rules/reapply').error(new ProgressEvent('error'));
+        expect(component.reapplying()).toBe(false);
+        expect(component.reapplyMsg()).toBe('');
+        expect(component.errorMsg()).toBe('Regeln konnten nicht angewendet werden');
+      });
+    });
+
+    describe('Auszüge', () => {
+      it('löscht einen Auszug nach Bestätigung', async () => {
+        const { fixture, component } = await setup();
+        vi.spyOn(window, 'confirm').mockReturnValue(true);
+        component.activeTab.set('statements');
+        fixture.detectChanges();
+
+        (fixture.nativeElement as HTMLElement)
+          .querySelector<HTMLButtonElement>('.btn-danger')!
+          .click();
+        const req = httpMock.expectOne('api/statements/1');
+        expect(req.request.method).toBe('DELETE');
+        req.flush(null);
+        fixture.detectChanges();
+
+        expect(component.statements()).toEqual([]);
+        expect((fixture.nativeElement as HTMLElement).querySelector('.empty')).toBeTruthy();
+      });
+
+      it('löscht nicht ohne Bestätigung', async () => {
+        const { component } = await setup();
+        vi.spyOn(window, 'confirm').mockReturnValue(false);
+        component.deleteStatement(1);
+        httpMock.expectNone('api/statements/1');
+      });
+
+      it('zeigt Fehler beim Löschen an', async () => {
+        const { component } = await setup();
+        vi.spyOn(window, 'confirm').mockReturnValue(true);
+        component.deleteStatement(1);
+        httpMock.expectOne('api/statements/1').flush({ error: 'Nicht gefunden' }, serverError(404));
+        expect(component.errorMsg()).toBe('Nicht gefunden');
+        expect(component.statements()).toHaveLength(1);
+      });
+    });
+
+    it.each([
+      ['api/rules', 'Regeln konnten nicht geladen werden'],
+      ['api/statements', 'Auszüge konnten nicht geladen werden'],
+    ])('meldet Ladefehler von %s', async (url, message) => {
+      const fixture = TestBed.createComponent(SettingsComponent);
+      fixture.detectChanges();
+      for (const u of ['api/categories', 'api/rules', 'api/statements']) {
+        const req = httpMock.expectOne(u);
+        if (u === url) req.error(new ProgressEvent('error'));
+        else req.flush([]);
+      }
+      expect(fixture.componentInstance.errorMsg()).toBe(message);
+    });
+  });
 });

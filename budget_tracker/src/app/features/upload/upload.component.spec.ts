@@ -186,4 +186,107 @@ describe('UploadComponent', () => {
     expect(component.formatEuro(100000)).toContain('1.000,00');
     expect(component.formatEuro(-4599)).toContain('-45,99');
   });
+
+  describe('Duplikate und Dateiauswahl', () => {
+    const file = () => new File(['dummy'], 'auszug.pdf', { type: 'application/pdf' });
+    const duplicate = {
+      error: 'Dieser Auszug wurde bereits importiert',
+      code: 'DUPLICATE_STATEMENT',
+    };
+
+    afterEach(() => vi.restoreAllMocks());
+
+    function start() {
+      const fixture = TestBed.createComponent(UploadComponent);
+      fixture.detectChanges();
+      const component = fixture.componentInstance;
+      const done = component.upload(file());
+      const first = httpMock.expectOne('api/statements');
+      return { fixture, component, done, first };
+    }
+
+    it('ersetzt nach Bestätigung einen bereits importierten Auszug', async () => {
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+      const { component, done, first } = start();
+      first.flush(duplicate, { status: 409, statusText: 'Conflict' });
+
+      const replace = await vi.waitFor(() => httpMock.expectOne('api/statements?replace=true'));
+      expect(replace.request.method).toBe('POST');
+      expect(replace.request.body).toBeInstanceOf(FormData);
+      replace.flush(createMockImportResult());
+      await done;
+
+      expect(confirmSpy.mock.calls[0]![0]).toContain('bereits importiert');
+      expect(component.result()?.statement.id).toBe(1);
+      expect(component.error()).toBeNull();
+      expect(component.uploading()).toBe(false);
+    });
+
+    it('zeigt die Duplikat-Meldung, wenn Ersetzen abgelehnt wird', async () => {
+      vi.spyOn(window, 'confirm').mockReturnValue(false);
+      const { component, done, first } = start();
+      first.flush(duplicate, { status: 409, statusText: 'Conflict' });
+      await done;
+
+      httpMock.expectNone('api/statements?replace=true');
+      expect(component.error()).toBe(duplicate.error);
+      expect(component.result()).toBeNull();
+    });
+
+    it('zeigt die Server-Meldung, wenn das Ersetzen fehlschlägt', async () => {
+      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      const { fixture, component, done, first } = start();
+      first.flush(duplicate, { status: 409, statusText: 'Conflict' });
+      const replace = await vi.waitFor(() => httpMock.expectOne('api/statements?replace=true'));
+      replace.flush(
+        { error: 'Die Datei ist kein PDF-Dokument.' },
+        { status: 400, statusText: 'Bad Request' },
+      );
+      await done;
+      fixture.detectChanges();
+
+      expect(component.error()).toBe('Die Datei ist kein PDF-Dokument.');
+      expect(component.uploading()).toBe(false);
+    });
+
+    it('zeigt Validierungsfehler des Servers direkt an', async () => {
+      const confirmSpy = vi.spyOn(window, 'confirm');
+      const { component, done, first } = start();
+      first.flush(
+        { error: 'Die Datei ist zu groß (maximal 10 MB).' },
+        { status: 413, statusText: 'Too Large' },
+      );
+      await done;
+
+      expect(confirmSpy).not.toHaveBeenCalled();
+      expect(component.error()).toBe('Die Datei ist zu groß (maximal 10 MB).');
+    });
+
+    it('lädt die gewählte Datei hoch und setzt vorherige Ergebnisse zurück', async () => {
+      const fixture = TestBed.createComponent(UploadComponent);
+      const component = fixture.componentInstance;
+      component.error.set('alter Fehler');
+      component.result.set(createMockImportResult());
+
+      const input = document.createElement('input');
+      Object.defineProperty(input, 'files', { value: [file()] });
+      const done = component.onFileSelected({ target: input } as unknown as Event);
+
+      expect(component.fileName()).toBe('auszug.pdf');
+      expect(component.result()).toBeNull();
+      expect(component.error()).toBeNull();
+      httpMock.expectOne('api/statements').flush(createMockImportResult());
+      await done;
+      expect(component.result()).not.toBeNull();
+    });
+
+    it('ignoriert eine leere Dateiauswahl', async () => {
+      const fixture = TestBed.createComponent(UploadComponent);
+      const input = document.createElement('input');
+      Object.defineProperty(input, 'files', { value: [] });
+      await fixture.componentInstance.onFileSelected({ target: input } as unknown as Event);
+      httpMock.expectNone('api/statements');
+      expect(fixture.componentInstance.fileName()).toBe('');
+    });
+  });
 });

@@ -1,10 +1,13 @@
 # Dependabot: automatische Update-PRs für npm, GitHub Actions und das Docker-Basisimage.
-# Jeder PR durchläuft „Code Quality“ und „CI — Build & Tests“.
+# Jeder PR durchläuft „Code Quality“ und „CI — Build & Tests“ für das betroffene Add-on.
+# Neue Add-ons unter `directories` bei npm und docker ergänzen.
 version: 2
 
 updates:
   - package-ecosystem: npm
-    directory: /budget_tracker
+    directories:
+      - /budget_tracker
+      - /new_addon
     schedule:
       interval: weekly
       day: monday
@@ -65,7 +68,9 @@ updates:
           - '*'
 
   - package-ecosystem: docker
-    directory: /budget_tracker
+    directories:
+      - /budget_tracker
+      - /new_addon
     schedule:
       interval: weekly
       day: monday

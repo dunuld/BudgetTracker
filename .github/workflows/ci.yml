@@ -1,28 +1,67 @@
 name: CI — Build & Tests
 
+# Läuft pro Add-on: Bei Push/PR nur für Add-ons mit Änderungen (Änderungen an .github/ → alle),
+# manuell für alle. Der Release-Workflow ruft diesen Workflow für das getaggte Add-on auf.
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      addons:
+        description: 'JSON-Array der zu prüfenden Add-ons, z. B. ["budget_tracker"]'
+        type: string
+        required: true
 
 permissions:
   contents: read
 
+# Fester Präfix statt github.workflow: als Reusable Workflow würde sonst der Name des
+# Aufrufers verwendet und CI und Code Quality brächen sich gegenseitig ab.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-defaults:
-  run:
-    working-directory: budget_tracker
-
 jobs:
+  detect:
+    name: Betroffene Add-ons ermitteln
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      addons: ${{ steps.detect.outputs.addons }}
+
+    steps:
+      - name: Repository klonen
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Add-ons ermitteln
+        id: detect
+        env:
+          ADDONS: ${{ inputs.addons }}
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          addons=$(.github/scripts/changed-addons.sh)
+          echo "addons=$addons" >> "$GITHUB_OUTPUT"
+          echo "Zu prüfende Add-ons: $addons" >> "$GITHUB_STEP_SUMMARY"
+
   build:
-    name: Build (Angular + Server)
+    name: Build ${{ matrix.addon }}
+    needs: detect
+    if: ${{ needs.detect.outputs.addons != '[]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        addon: ${{ fromJSON(needs.detect.outputs.addons) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.addon }}
 
     steps:
       - name: Repository klonen
@@ -33,7 +72,7 @@ jobs:
         with:
           node-version: 24
           cache: 'npm'
-          cache-dependency-path: budget_tracker/package-lock.json
+          cache-dependency-path: ${{ matrix.addon }}/package-lock.json
 
       - name: Dependencies installieren
         run: npm ci
@@ -42,19 +81,24 @@ jobs:
         run: npm run build:all
 
   test:
-    name: Tests (${{ matrix.suite }})
+    name: Tests ${{ matrix.addon }} (${{ matrix.suite }})
+    needs: detect
+    if: ${{ needs.detect.outputs.addons != '[]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
+        addon: ${{ fromJSON(needs.detect.outputs.addons) }}
+        suite: [angular, server]
         include:
           - suite: angular
             script: test:coverage
-            report: coverage/BudgetTracker
           - suite: server
             script: test:server:coverage
-            report: coverage/server
+    defaults:
+      run:
+        working-directory: ${{ matrix.addon }}
 
     steps:
       - name: Repository klonen
@@ -65,27 +109,42 @@ jobs:
         with:
           node-version: 24
           cache: 'npm'
-          cache-dependency-path: budget_tracker/package-lock.json
+          cache-dependency-path: ${{ matrix.addon }}/package-lock.json
 
       - name: Dependencies installieren
         run: npm ci
 
       # Schlägt fehl, wenn ein Test fehlschlägt oder die Coverage unter die Schwelle fällt
-      # (Schwellen: server/vitest.config.ts bzw. angular.json → test.options.coverageThresholds).
+      # (Schwellen: <addon>/server/vitest.config.ts bzw. <addon>/angular.json →
+      # test.options.coverageThresholds).
       - name: Tests mit Coverage ausführen
         run: npm run ${{ matrix.script }}
+
+      # Server-Coverage liegt in coverage/server, Angular-Coverage in coverage/<Angular-Projekt>.
+      - name: Coverage-Verzeichnis ermitteln
+        id: report
+        if: ${{ !cancelled() }}
+        env:
+          SUITE: ${{ matrix.suite }}
+        run: |
+          if [ "$SUITE" = server ]; then
+            dir=coverage/server
+          else
+            dir=$(find coverage -mindepth 1 -maxdepth 1 -type d ! -name server 2>/dev/null | head -n 1)
+          fi
+          echo "dir=${dir:-coverage/none}" >> "$GITHUB_OUTPUT"
 
       - name: Coverage in Job-Zusammenfassung schreiben
         if: ${{ !cancelled() }}
         env:
-          REPORT: ${{ matrix.report }}/coverage-summary.json
-          SUITE: ${{ matrix.suite }}
+          REPORT: ${{ steps.report.outputs.dir }}/coverage-summary.json
+          TITLE: ${{ matrix.addon }} (${{ matrix.suite }})
         run: |
           [ -f "$REPORT" ] || exit 0
           node -e '
             const t = require(require("node:path").resolve(process.env.REPORT)).total;
             const row = (k) => `| ${k} | ${t[k].pct}% | ${t[k].covered}/${t[k].total} |`;
-            console.log([`### Coverage: ${process.env.SUITE}`, "", "| Metrik | % | abgedeckt |", "|---|---|---|",
+            console.log([`### Coverage: ${process.env.TITLE}`, "", "| Metrik | % | abgedeckt |", "|---|---|---|",
               ...["lines", "statements", "branches", "functions"].map(row)].join("\n"));
           ' >> "$GITHUB_STEP_SUMMARY"
 
@@ -93,7 +152,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
-          name: coverage-${{ matrix.suite }}
-          path: budget_tracker/${{ matrix.report }}
+          name: coverage-${{ matrix.addon }}-${{ matrix.suite }}
+          path: ${{ matrix.addon }}/${{ steps.report.outputs.dir }}
           retention-days: 14
           if-no-files-found: ignore

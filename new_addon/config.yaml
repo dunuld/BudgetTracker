@@ -1,0 +1,22 @@
+name: Neues Add-on
+version: '0.1.0'
+slug: new_addon
+description: Grundgerüst für ein weiteres Home Assistant Add-on
+# Im Add-on Store als experimentell markiert, solange das Add-on keine Funktion hat
+stage: experimental
+arch:
+  - amd64
+  - aarch64
+startup: application
+boot: auto
+init: true
+# Zugriff ausschließlich über HA-Ingress, keine Ports nach außen
+ingress: true
+ingress_port: 8099
+ingress_stream: false
+panel_icon: mdi:puzzle
+panel_title: Neues Add-on
+panel_admin: false
+# /data wird vom Supervisor immer persistent eingebunden
+options: {}
+schema: {}

@@ -1,0 +1,22 @@
+<header class="app-header">
+  <nav class="app-nav" aria-label="Hauptnavigation">
+    <div class="nav-brand">Neues Add-on</div>
+    <div class="nav-links">
+      <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+        >Start</a
+      >
+    </div>
+    <button
+      class="theme-toggle"
+      (click)="themeService.toggle()"
+      [title]="themeTitle()"
+      [attr.aria-label]="themeTitle()"
+      type="button"
+    >
+      {{ themeLabel() }}
+    </button>
+  </nav>
+</header>
+<main class="app-main">
+  <router-outlet></router-outlet>
+</main>

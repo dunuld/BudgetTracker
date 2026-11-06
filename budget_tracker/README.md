@@ -24,7 +24,7 @@ automatisch ausgelesen, anhand von Regeln kategorisiert und als Diagramme darges
 Alle Details zu Installation, Konfiguration und Nutzung findest du im Tab **Dokumentation**
 bzw. in der [DOCS.md](DOCS.md).
 
-[version-badge]: https://img.shields.io/badge/dynamic/yaml?label=Version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdunuld%2FBudgetTracker%2Fmain%2Fbudget_tracker%2Fconfig.yaml
+[version-badge]: https://img.shields.io/badge/dynamic/yaml?label=Version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdunuld%2FTracker-Addons%2Fmain%2Fbudget_tracker%2Fconfig.yaml
 [amd64-badge]: https://img.shields.io/badge/amd64-yes-green
 [aarch64-badge]: https://img.shields.io/badge/aarch64-yes-green
 [ingress-badge]: https://img.shields.io/badge/ingress-yes-green

@@ -15,9 +15,27 @@ describe('TrendComponent', () => {
       { id: 2, name: 'Miete', color: '#f44336', kind: 'expense' },
     ],
     months: [
-      { month: '2024-01', totals: [{ categoryId: 1, totalCents: -50000 }, { categoryId: 2, totalCents: -80000 }] },
-      { month: '2024-02', totals: [{ categoryId: 1, totalCents: -45000 }, { categoryId: 2, totalCents: -80000 }] },
-      { month: '2024-03', totals: [{ categoryId: 1, totalCents: -55000 }, { categoryId: 2, totalCents: -80000 }] },
+      {
+        month: '2024-01',
+        totals: [
+          { categoryId: 1, totalCents: -50000 },
+          { categoryId: 2, totalCents: -80000 },
+        ],
+      },
+      {
+        month: '2024-02',
+        totals: [
+          { categoryId: 1, totalCents: -45000 },
+          { categoryId: 2, totalCents: -80000 },
+        ],
+      },
+      {
+        month: '2024-03',
+        totals: [
+          { categoryId: 1, totalCents: -55000 },
+          { categoryId: 2, totalCents: -80000 },
+        ],
+      },
     ],
   });
 
@@ -37,7 +55,7 @@ describe('TrendComponent', () => {
     const fixture = TestBed.createComponent(TrendComponent);
     fixture.detectChanges();
     expect(fixture.componentInstance).toBeTruthy();
-    httpMock.expectOne(req => req.url.includes('api/reports/trend')).flush({} as TrendReport);
+    httpMock.expectOne((req) => req.url.includes('api/reports/trend')).flush({} as TrendReport);
   });
 
   it('should show loading state initially', () => {
@@ -45,7 +63,7 @@ describe('TrendComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.loading')?.textContent).toContain('Lade Daten');
-    httpMock.expectOne(req => req.url.includes('api/reports/trend')).flush({} as TrendReport);
+    httpMock.expectOne((req) => req.url.includes('api/reports/trend')).flush({} as TrendReport);
   });
 
   it('should display trend report with chart and table', async () => {
@@ -53,7 +71,7 @@ describe('TrendComponent', () => {
     fixture.detectChanges();
 
     const mockReport = createMockTrendReport();
-    httpMock.expectOne(req => req.url.includes('api/reports/trend')).flush(mockReport);
+    httpMock.expectOne((req) => req.url.includes('api/reports/trend')).flush(mockReport);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -67,7 +85,7 @@ describe('TrendComponent', () => {
     fixture.detectChanges();
 
     const mockReport = createMockTrendReport();
-    httpMock.expectOne(req => req.url.includes('api/reports/trend')).flush(mockReport);
+    httpMock.expectOne((req) => req.url.includes('api/reports/trend')).flush(mockReport);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -80,7 +98,9 @@ describe('TrendComponent', () => {
     const fixture = TestBed.createComponent(TrendComponent);
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/reports/trend')).error(new ProgressEvent('error'));
+    httpMock
+      .expectOne((req) => req.url.includes('api/reports/trend'))
+      .error(new ProgressEvent('error'));
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -93,7 +113,7 @@ describe('TrendComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/reports/trend')).flush({} as TrendReport);
+    httpMock.expectOne((req) => req.url.includes('api/reports/trend')).flush({} as TrendReport);
 
     component.fromMonth.set('2024-01');
     component.toMonth.set('2024-06');
@@ -106,7 +126,7 @@ describe('TrendComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/reports/trend')).flush({} as TrendReport);
+    httpMock.expectOne((req) => req.url.includes('api/reports/trend')).flush({} as TrendReport);
 
     expect(component.formatMonthLabel('2024-01')).toBe('Januar 2024');
     expect(component.formatMonthLabel('2024-12')).toBe('Dezember 2024');
@@ -117,7 +137,7 @@ describe('TrendComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/reports/trend')).flush({} as TrendReport);
+    httpMock.expectOne((req) => req.url.includes('api/reports/trend')).flush({} as TrendReport);
 
     expect(component.formatEuro(100000)).toContain('1.000,00');
     expect(component.formatEuro(-4599)).toContain('-45,99');
@@ -128,7 +148,7 @@ describe('TrendComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/reports/trend')).flush({} as TrendReport);
+    httpMock.expectOne((req) => req.url.includes('api/reports/trend')).flush({} as TrendReport);
 
     const month = { month: '2024-01', totals: [{ categoryId: 1, totalCents: -50000 }] };
     expect(component.formatMonthCategoryTotal(month, 1)).toContain('-500,00');
@@ -139,7 +159,9 @@ describe('TrendComponent', () => {
     const fixture = TestBed.createComponent(TrendComponent);
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/reports/trend')).error(new ProgressEvent('error'));
+    httpMock
+      .expectOne((req) => req.url.includes('api/reports/trend'))
+      .error(new ProgressEvent('error'));
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -152,7 +174,7 @@ describe('TrendComponent', () => {
     fixture.detectChanges();
 
     const mockReport = createMockTrendReport();
-    httpMock.expectOne(req => req.url.includes('api/reports/trend')).flush(mockReport);
+    httpMock.expectOne((req) => req.url.includes('api/reports/trend')).flush(mockReport);
     await fixture.whenStable();
     fixture.detectChanges();
 

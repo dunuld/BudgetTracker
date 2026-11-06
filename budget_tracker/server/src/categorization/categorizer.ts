@@ -23,8 +23,12 @@ export class Categorizer {
         `SELECT id, category_id, field, match_type, pattern FROM rules ORDER BY priority, id`,
       )
       .all() as Array<{
-        id: number; category_id: number; field: RuleField; match_type: 'contains' | 'regex'; pattern: string;
-      }>;
+      id: number;
+      category_id: number;
+      field: RuleField;
+      match_type: 'contains' | 'regex';
+      pattern: string;
+    }>;
 
     for (const rule of rules) {
       if (this.matches(rule, tx)) {
@@ -89,7 +93,10 @@ export class Categorizer {
     return Number(lastInsertRowid);
   }
 
-  private matches(rule: { field: RuleField; match_type: 'contains' | 'regex'; pattern: string }, tx: ParsedTransaction): boolean {
+  private matches(
+    rule: { field: RuleField; match_type: 'contains' | 'regex'; pattern: string },
+    tx: ParsedTransaction,
+  ): boolean {
     const text = this.getFieldText(rule.field, tx);
     if (!text) return false;
     const patternUpper = rule.pattern.toUpperCase();

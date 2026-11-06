@@ -1,5 +1,11 @@
 import type { DatabaseSync } from 'node:sqlite';
-import type { CategoryKind, CategoryTotal, MonthlyReport, TrendMonth, TrendReport } from '../../../shared/api-types.js';
+import type {
+  CategoryKind,
+  CategoryTotal,
+  MonthlyReport,
+  TrendMonth,
+  TrendReport,
+} from '../../../shared/api-types.js';
 
 /**
  * Berechnet Monats- und Trendberichte aus den gespeicherten Transaktionen.
@@ -23,13 +29,13 @@ export class ReportService {
          ORDER BY c.sort, c.name`,
       )
       .all(`${year}-${String(month).padStart(2, '0')}-01`, this.nextMonth(year, month)) as Array<{
-        id: number;
-        name: string;
-        color: string;
-        kind: CategoryKind;
-        total_cents: number;
-        count: number;
-      }>;
+      id: number;
+      name: string;
+      color: string;
+      kind: CategoryKind;
+      total_cents: number;
+      count: number;
+    }>;
 
     let incomeCents = 0;
     let expenseCents = 0;
@@ -64,7 +70,9 @@ export class ReportService {
   trend(from: string, to: string): TrendReport {
     // Kategorien laden (ohne Umbuchungen)
     const categories = this.db
-      .prepare("SELECT id, name, color, kind FROM categories WHERE kind != 'transfer' ORDER BY sort, name")
+      .prepare(
+        "SELECT id, name, color, kind FROM categories WHERE kind != 'transfer' ORDER BY sort, name",
+      )
       .all() as Array<{ id: number; name: string; color: string; kind: CategoryKind }>;
 
     const months: TrendMonth[] = [];
@@ -82,9 +90,9 @@ export class ReportService {
            HAVING total_cents != 0`,
         )
         .all(`${y}-${String(m).padStart(2, '0')}-01`, next) as Array<{
-          category_id: number;
-          total_cents: number;
-        }>;
+        category_id: number;
+        total_cents: number;
+      }>;
 
       months.push({
         month: current,

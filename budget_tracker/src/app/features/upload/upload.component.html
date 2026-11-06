@@ -4,7 +4,7 @@
   <label class="drop-zone">
     <span class="icon">📄</span>
     <span>PDF-Kontoauszug auswählen oder hierher ziehen</span>
-    <input type="file" accept=".pdf,application/pdf" (change)="onFileSelected($event)" hidden>
+    <input type="file" accept=".pdf,application/pdf" (change)="onFileSelected($event)" hidden />
   </label>
   <div *ngIf="uploading()" class="loading">Wird hochgeladen …</div>
 </div>
@@ -17,7 +17,11 @@
   <h3>Import erfolgreich</h3>
   <dl>
     <dt>Auszug</dt>
-    <dd>{{ result()!.statement.iban }} — {{ result()!.statement.month }}/{{ result()!.statement.year }}</dd>
+    <dd>
+      {{ result()!.statement.iban }} — {{ result()!.statement.month }}/{{
+        result()!.statement.year
+      }}
+    </dd>
     <dt>Zeitraum</dt>
     <dd>{{ result()!.periodFrom }} bis {{ result()!.periodTo }}</dd>
     <dt>Buchungen</dt>

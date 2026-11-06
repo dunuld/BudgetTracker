@@ -49,7 +49,11 @@ export function isGermanDate(text: string): boolean {
 
 /** `Oktober` → 10 (auch `Maerz`/`Marz`, ohne Beachtung der Groß-/Kleinschreibung); sonst `null`. */
 export function parseGermanMonth(name: string): number | null {
-  const normalized = name.trim().toLowerCase().replace('ae', 'ä').replace(/^marz$/, 'märz');
+  const normalized = name
+    .trim()
+    .toLowerCase()
+    .replace('ae', 'ä')
+    .replace(/^marz$/, 'märz');
   const index = GERMAN_MONTHS.findIndex((m) => m.toLowerCase() === normalized);
   return index >= 0 ? index + 1 : null;
 }

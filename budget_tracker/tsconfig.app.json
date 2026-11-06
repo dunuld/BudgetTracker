@@ -6,11 +6,6 @@
     "types": [],
     "rootDirs": ["src", "shared"]
   },
-  "include": [
-    "src/**/*.ts",
-    "shared/**/*.ts"
-  ],
-  "exclude": [
-    "src/**/*.spec.ts"
-  ]
+  "include": ["src/**/*.ts", "shared/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts"]
 }

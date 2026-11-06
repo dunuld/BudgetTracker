@@ -70,7 +70,7 @@ describe('UploadComponent', () => {
     const file = new File(['dummy'], 'auszug.pdf', { type: 'application/pdf' });
 
     const uploadPromise = component.upload(file);
-    const req = httpMock.expectOne(req => req.url.includes('api/statements'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/statements'));
     req.flush(mockResult);
     await uploadPromise;
     fixture.detectChanges();
@@ -92,7 +92,7 @@ describe('UploadComponent', () => {
     fixture.detectChanges();
     expect(component.uploading()).toBe(true);
 
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush(createMockImportResult());
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush(createMockImportResult());
   });
 
   it('should handle upload error', async () => {
@@ -103,7 +103,7 @@ describe('UploadComponent', () => {
     const file = new File(['dummy'], 'auszug.pdf', { type: 'application/pdf' });
 
     const uploadPromise = component.upload(file);
-    const req = httpMock.expectOne(req => req.url.includes('api/statements'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/statements'));
     req.error(new ProgressEvent('error'));
     await uploadPromise;
     fixture.detectChanges();
@@ -121,7 +121,7 @@ describe('UploadComponent', () => {
     const file = new File(['dummy'], 'auszug.pdf', { type: 'application/pdf' });
 
     const uploadPromise = component.upload(file);
-    const req = httpMock.expectOne(req => req.url.includes('api/statements'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/statements'));
     req.flush(mockResult);
     await uploadPromise;
     fixture.detectChanges();
@@ -141,7 +141,7 @@ describe('UploadComponent', () => {
     const file = new File(['dummy'], 'auszug.pdf', { type: 'application/pdf' });
 
     const uploadPromise = component.upload(file);
-    const req = httpMock.expectOne(req => req.url.includes('api/statements'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/statements'));
     req.flush(mockResult);
     await uploadPromise;
     fixture.detectChanges();
@@ -160,7 +160,7 @@ describe('UploadComponent', () => {
     const file = new File(['dummy'], 'auszug.pdf', { type: 'application/pdf' });
 
     const uploadPromise = component.upload(file);
-    const req = httpMock.expectOne(req => req.url.includes('api/statements'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/statements'));
     req.flush(mockResult);
     await uploadPromise;
     fixture.detectChanges();

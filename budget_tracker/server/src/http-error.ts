@@ -17,5 +17,6 @@ export class HttpError extends Error {
   }
 }
 
-export const badRequest = (message: string, code = 'BAD_REQUEST') => new HttpError(400, message, code);
+export const badRequest = (message: string, code = 'BAD_REQUEST') =>
+  new HttpError(400, message, code);
 export const notFound = (message = 'Nicht gefunden') => new HttpError(404, message, 'NOT_FOUND');

@@ -3,7 +3,13 @@ import type { DatabaseSync } from 'node:sqlite';
 import type { ParsedTransaction } from '../parsing/bank-parser.js';
 import { Categorizer } from '../categorization/categorizer.js';
 import { badRequest, notFound } from '../http-error.js';
-import type { Rule, Transaction, TransactionPatch, TransactionPatchResult, TransactionQuery } from '../../../shared/api-types.js';
+import type {
+  Rule,
+  Transaction,
+  TransactionPatch,
+  TransactionPatchResult,
+  TransactionQuery,
+} from '../../../shared/api-types.js';
 
 function toTransaction(row: Record<string, unknown>): Transaction {
   return {
@@ -47,9 +53,7 @@ export function transactionsRouter(db: DatabaseSync): Router {
 
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const rows = db
-      .prepare(
-        `SELECT t.* FROM transactions t ${where} ORDER BY t.booking_date, t.id`,
-      )
+      .prepare(`SELECT t.* FROM transactions t ${where} ORDER BY t.booking_date, t.id`)
       .all(...params);
     res.json(rows.map(toTransaction));
   });

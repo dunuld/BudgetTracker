@@ -20,9 +20,7 @@ export function rulesRouter(db: DatabaseSync): Router {
   const categorizer = new Categorizer(db);
 
   router.get('/', (_req, res) => {
-    const rows = db
-      .prepare('SELECT * FROM rules ORDER BY priority, id')
-      .all();
+    const rows = db.prepare('SELECT * FROM rules ORDER BY priority, id').all();
     res.json(rows.map(toRule));
   });
 
@@ -49,16 +47,24 @@ export function rulesRouter(db: DatabaseSync): Router {
         `INSERT INTO rules (category_id, field, match_type, pattern, priority)
          VALUES (?, ?, ?, ?, COALESCE(?, 100))`,
       )
-      .run(input.categoryId, input.field ?? 'any', input.matchType ?? 'contains', input.pattern.trim(), input.priority ?? 100);
+      .run(
+        input.categoryId,
+        input.field ?? 'any',
+        input.matchType ?? 'contains',
+        input.pattern.trim(),
+        input.priority ?? 100,
+      );
 
-    res.status(201).json(toRule({
-      id: lastInsertRowid,
-      category_id: input.categoryId,
-      field: input.field ?? 'any',
-      match_type: input.matchType ?? 'contains',
-      pattern: input.pattern.trim(),
-      priority: input.priority ?? 100,
-    }));
+    res.status(201).json(
+      toRule({
+        id: lastInsertRowid,
+        category_id: input.categoryId,
+        field: input.field ?? 'any',
+        match_type: input.matchType ?? 'contains',
+        pattern: input.pattern.trim(),
+        priority: input.priority ?? 100,
+      }),
+    );
   });
 
   router.post('/reapply', (_req, res) => {

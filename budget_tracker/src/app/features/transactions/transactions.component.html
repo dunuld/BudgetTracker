@@ -12,7 +12,13 @@
     <option *ngFor="let c of categories()" [value]="c.id">{{ c.name }}</option>
   </select>
 
-  <input type="text" placeholder="Suchen …" [value]="search()" (input)="onSearchChange($event)" class="search-input">
+  <input
+    type="text"
+    placeholder="Suchen …"
+    [value]="search()"
+    (input)="onSearchChange($event)"
+    class="search-input"
+  />
 </div>
 
 <div *ngIf="error()" class="error">{{ error() }}</div>
@@ -31,14 +37,16 @@
   </thead>
   <tbody>
     <tr *ngFor="let tx of transactions()">
-      <td>{{ tx.bookingDate | date:'dd.MM.yyyy' }}</td>
+      <td>{{ tx.bookingDate | date: 'dd.MM.yyyy' }}</td>
       <td>{{ tx.type }}</td>
       <td>{{ tx.counterparty }}</td>
       <td class="purpose">{{ tx.purpose }}</td>
       <td class="amount" [class.positive]="tx.amountCents > 0">{{ formatEuro(tx.amountCents) }}</td>
       <td>
         <select [value]="tx.categoryId ?? ''" (change)="onCategoryChange(tx, $event)">
-          <option *ngFor="let c of categories()" [value]="c.id" [style.color]="c.color">{{ c.name }}</option>
+          <option *ngFor="let c of categories()" [value]="c.id" [style.color]="c.color">
+            {{ c.name }}
+          </option>
         </select>
       </td>
     </tr>

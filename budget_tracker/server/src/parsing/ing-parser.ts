@@ -89,7 +89,8 @@ export class IngParser implements BankParser {
 
     const periodMatch = find(/^Kontoauszug\s+(\S+)\s+(\d{4})$/);
     const month = periodMatch ? parseGermanMonth(periodMatch[1]!) : null;
-    if (!periodMatch || !month) throw new StatementParseError('Monat des Kontoauszugs nicht gefunden');
+    if (!periodMatch || !month)
+      throw new StatementParseError('Monat des Kontoauszugs nicht gefunden');
 
     const opening = find(/^Alter Saldo\s+(.+)$/);
     const openingCents = opening ? parseAmountCents(opening[1]!) : null;
@@ -151,7 +152,10 @@ export class IngParser implements BankParser {
 
       if (current.valueDate === null && current.details.length === 0 && isDateCell(line)) {
         current.valueDate = parseGermanDate(first(line).text);
-        current.valueLineText = line.segments.slice(1).map((s) => s.text).join(' ');
+        current.valueLineText = line.segments
+          .slice(1)
+          .map((s) => s.text)
+          .join(' ');
         continue;
       }
       if (first(line).x >= TEXT_COLUMN_MIN_X) {
@@ -176,7 +180,10 @@ function parseBookingHead(line: TextLine): Draft | null {
   let counterparty: string;
   if (middle.length >= 2) {
     type = middle[0]!.text;
-    counterparty = middle.slice(1).map((s) => s.text).join(' ');
+    counterparty = middle
+      .slice(1)
+      .map((s) => s.text)
+      .join(' ');
   } else {
     const [head = '', ...rest] = middle[0]!.text.split(' ');
     type = head;

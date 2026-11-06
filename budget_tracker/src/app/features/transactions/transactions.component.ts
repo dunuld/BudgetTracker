@@ -87,7 +87,10 @@ export default class TransactionsComponent {
   prevMonth() {
     let m = this.month() - 1;
     let y = this.year();
-    if (m < 1) { m = 12; y--; }
+    if (m < 1) {
+      m = 12;
+      y--;
+    }
     this.month.set(m);
     this.year.set(y);
   }
@@ -95,7 +98,10 @@ export default class TransactionsComponent {
   nextMonth() {
     let m = this.month() + 1;
     let y = this.year();
-    if (m > 12) { m = 1; y++; }
+    if (m > 12) {
+      m = 1;
+      y++;
+    }
     this.month.set(m);
     this.year.set(y);
   }

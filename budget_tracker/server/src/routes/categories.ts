@@ -18,34 +18,33 @@ export function categoriesRouter(db: DatabaseSync): Router {
   const router = Router();
 
   router.get('/', (_req, res) => {
-    const rows = db
-      .prepare('SELECT * FROM categories ORDER BY sort, name')
-      .all();
+    const rows = db.prepare('SELECT * FROM categories ORDER BY sort, name').all();
     res.json(rows.map(toCategory));
   });
 
   router.post('/', (req, res) => {
     const input = req.body as CategoryInput;
     if (!input.name?.trim()) throw badRequest('Name ist erforderlich');
-    if (!input.color?.match(/^#[0-9A-Fa-f]{6}$/)) throw badRequest('Ungültige Farbe (z. B. #4caf50)');
+    if (!input.color?.match(/^#[0-9A-Fa-f]{6}$/))
+      throw badRequest('Ungültige Farbe (z. B. #4caf50)');
     if (!['expense', 'income', 'transfer'].includes(input.kind)) {
       throw badRequest('Ungültiger Typ (expense, income, transfer)');
     }
 
     const { lastInsertRowid } = db
-      .prepare(
-        "INSERT INTO categories (name, color, kind, sort) VALUES (?, ?, ?, COALESCE(?, 0))",
-      )
+      .prepare('INSERT INTO categories (name, color, kind, sort) VALUES (?, ?, ?, COALESCE(?, 0))')
       .run(input.name.trim(), input.color, input.kind, input.sort ?? 0);
 
-    res.status(201).json(toCategory({
-      id: lastInsertRowid,
-      name: input.name.trim(),
-      color: input.color,
-      kind: input.kind,
-      sort: input.sort ?? 0,
-      is_default: 0,
-    }));
+    res.status(201).json(
+      toCategory({
+        id: lastInsertRowid,
+        name: input.name.trim(),
+        color: input.color,
+        kind: input.kind,
+        sort: input.sort ?? 0,
+        is_default: 0,
+      }),
+    );
   });
 
   router.get('/:id', (req, res) => {
@@ -67,8 +66,12 @@ export function categoriesRouter(db: DatabaseSync): Router {
     const kind = input.kind || String(existing['kind']);
 
     if (name.trim()) {
-      db.prepare('UPDATE categories SET name = ?, color = ?, kind = ? WHERE id = ?')
-        .run(name.trim(), color, kind, id);
+      db.prepare('UPDATE categories SET name = ?, color = ?, kind = ? WHERE id = ?').run(
+        name.trim(),
+        color,
+        kind,
+        id,
+      );
     }
 
     const row = db.prepare('SELECT * FROM categories WHERE id = ?').get(id);

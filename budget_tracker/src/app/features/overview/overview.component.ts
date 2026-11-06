@@ -13,9 +13,23 @@ import type { MonthlyReport } from '../../../../shared/api-types';
     <div class="page-header">
       <h2>Monatsübersicht</h2>
       <div class="month-nav">
-        <button class="btn-icon" (click)="prevMonth()" [disabled]="loading()">‹</button>
+        <button
+          class="btn-icon"
+          (click)="prevMonth()"
+          [disabled]="loading()"
+          aria-label="Vorheriger Monat"
+        >
+          ‹
+        </button>
         <span class="month-label">{{ formatMonthYear(currentYear(), currentMonth()) }}</span>
-        <button class="btn-icon" (click)="nextMonth()" [disabled]="loading()">›</button>
+        <button
+          class="btn-icon"
+          (click)="nextMonth()"
+          [disabled]="loading()"
+          aria-label="Nächster Monat"
+        >
+          ›
+        </button>
       </div>
     </div>
 
@@ -38,7 +52,7 @@ import type { MonthlyReport } from '../../../../shared/api-types';
       </div>
 
       @if (expenseCategories().length > 0) {
-        <div class="chart-section">
+        <div class="chart-section bt-card">
           <h3>Ausgaben nach Kategorie</h3>
           <div class="chart-container">
             <app-chart
@@ -55,7 +69,7 @@ import type { MonthlyReport } from '../../../../shared/api-types';
           </div>
         </div>
 
-        <div class="category-table">
+        <div class="category-table bt-card table-scroll">
           <table>
             <thead>
               <tr>
@@ -112,18 +126,26 @@ import type { MonthlyReport } from '../../../../shared/api-types';
     }
     .month-label {
       font-size: 1.1rem;
-      font-weight: 600;
-      min-width: 180px;
+      font-weight: 500;
+      min-width: 160px;
       text-align: center;
     }
     .btn-icon {
-      background: var(--ha-hover-color, var(--bt-bg-tertiary));
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
       border: none;
-      border-radius: 4px;
-      padding: 0.3rem 0.6rem;
-      font-size: 1.2rem;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      line-height: 1;
       cursor: pointer;
       color: var(--bt-text);
+    }
+    .btn-icon:hover:not(:disabled) {
+      background: var(--bt-hover-btn);
     }
     .btn-icon:disabled {
       opacity: 0.4;
@@ -132,13 +154,13 @@ import type { MonthlyReport } from '../../../../shared/api-types';
 
     .summary-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 1rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
     }
     .card {
       padding: 1rem;
-      border-radius: 8px;
+      border-radius: var(--bt-radius);
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
@@ -158,23 +180,18 @@ import type { MonthlyReport } from '../../../../shared/api-types';
     }
     .card-value {
       font-size: 1.4rem;
-      font-weight: 700;
+      font-weight: 600;
       color: var(--bt-text);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
-    .chart-section {
-      margin-bottom: 2rem;
-    }
     .chart-section h3 {
       margin: 0 0 1rem;
     }
     .chart-container {
       max-width: 400px;
       margin: 0 auto;
-    }
-
-    .category-table {
-      margin-bottom: 1rem;
     }
     table {
       width: 100%;
@@ -193,6 +210,8 @@ import type { MonthlyReport } from '../../../../shared/api-types';
     }
     .text-right {
       text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
     .clickable {
       cursor: pointer;
@@ -214,6 +233,39 @@ import type { MonthlyReport } from '../../../../shared/api-types';
       color: var(--bt-text-muted);
       text-align: center;
       padding: 2rem;
+    }
+
+    @media (max-width: 600px) {
+      .page-header {
+        margin-bottom: 1rem;
+      }
+      .month-nav {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .month-label {
+        min-width: 0;
+      }
+      .summary-cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.5rem;
+      }
+      .card {
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+      }
+      .card-label {
+        font-size: 0.75rem;
+      }
+      .card-value {
+        font-size: 0.95rem;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+      th,
+      td {
+        padding: 0.5rem 0.6rem;
+      }
     }
   `,
 })

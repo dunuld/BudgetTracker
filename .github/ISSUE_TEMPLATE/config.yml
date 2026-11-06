@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Dokumentation Haushaltsbuch
+    url: https://github.com/dunuld/hassio-addons/blob/main/budget_tracker/DOCS.md
+    about: Installation, Bedienung und häufige Fragen zum Haushaltsbuch.
+  - name: 🏠 Home Assistant Community
+    url: https://community.home-assistant.io/
+    about: Allgemeine Fragen zu Home Assistant, Supervisor und Add-ons.

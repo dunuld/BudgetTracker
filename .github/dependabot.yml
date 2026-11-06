@@ -1,0 +1,80 @@
+# Dependabot: automatische Update-PRs für npm, GitHub Actions und das Docker-Basisimage.
+# Jeder PR durchläuft „Code Quality“ und „CI — Build & Tests“.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /budget_tracker
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: deps
+      prefix-development: deps(dev)
+    # Gruppen greifen in dieser Reihenfolge; ein Update landet in der ersten passenden.
+    groups:
+      # Angular-Pakete müssen gemeinsam aktualisiert werden (gleiche Version).
+      angular:
+        patterns:
+          - '@angular/*'
+          - '@angular-devkit/*'
+          - angular-eslint
+          - '@angular-eslint/*'
+      lint:
+        patterns:
+          - eslint
+          - '@eslint/*'
+          - typescript-eslint
+          - '@typescript-eslint/*'
+          - prettier
+      vitest:
+        patterns:
+          - vitest
+          - '@vitest/*'
+      # Übrige Minor-/Patch-Updates in einem PR bündeln; Majors kommen einzeln.
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # Node.js ist auf 24 festgelegt (engines, Dockerfile, CI) → Typen nicht auf neuere Majors heben.
+      - dependency-name: '@types/node'
+        update-types:
+          - version-update:semver-major
+      # TypeScript folgt der von Angular unterstützten Version; Wechsel bewusst mit dem Angular-Update.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+          - version-update:semver-minor
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Berlin
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns:
+          - '*'
+
+  - package-ecosystem: docker
+    directory: /budget_tracker
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Berlin
+    commit-message:
+      prefix: deps(docker)
+    ignore:
+      # Node-Major (z. B. 26) nur bewusst wechseln – node:sqlite und engines hängen an Node 24.
+      - dependency-name: node
+        update-types:
+          - version-update:semver-major

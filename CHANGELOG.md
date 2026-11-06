@@ -21,6 +21,7 @@
 - Neuer Workflow „Code Quality“: Formatierung, Lint, Typprüfung, Dependency-Audit
 - Frontend-Tests für Einstellungen, Upload-Duplikate, Theme-Service, API-Service und Verlauf (Funktions-Coverage 50 % → 86 %); Coverage-Schwellen entsprechend angehoben
 - Services werden in Komponenten per `inject()` statt `new` bezogen
+- Dependabot: wöchentliche Update-PRs für npm (gruppiert: Angular, Lint, Vitest, Minor/Patch), GitHub Actions und das Docker-Basisimage; Node-Majors werden bewusst ausgelassen
 
 ## 1.0.0 (2026-11-05)
 

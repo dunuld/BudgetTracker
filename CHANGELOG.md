@@ -3,6 +3,7 @@
 ## 1.1.0 (2026-11-06)
 
 ### Geändert
+
 - **Home-Assistant-Einbettung**: Im Modus „System“ übernimmt das Panel jetzt Farben, Schrift und Hell/Dunkel des aktiven HA-Themes (auch bei Theme-Wechsel zur Laufzeit); manuelle Auswahl Hell/Dunkel hat weiterhin Vorrang
 - **Layout**: Kein weißer Rand/doppelter Scrollbalken mehr im Ingress-iframe; Navigation als fixierte, horizontal scrollbare Tab-Leiste im HA-Stil; Titel wird eingebettet ausgeblendet (steht bereits in HA)
 - **Karten-Design**: Diagramme und Tabellen in HA-ähnlichen Karten; Tabellen scrollen horizontal statt die Seite zu verbreitern
@@ -18,6 +19,7 @@
 - **Suche**: `%` und `_` werden wörtlich gesucht
 - **Verlauf**: Der Standardzeitraum begann am 29.–31. eines Monats einen Monat zu spät (Datumsüberlauf bei `setMonth`)
 - **Fehlermeldungen im Frontend**: Beim Ersetzen eines Auszugs und beim Ändern einer Kategorie wurde statt der Server-Meldung nur „Ersetzen fehlgeschlagen“ bzw. „Fehler“ angezeigt
+- **Kategorie-Auswahl**: Die Auswahlfelder in der Transaktionsliste und im Kategoriefilter zeigten immer die erste Kategorie statt der tatsächlich zugeordneten; unkategorisierte Buchungen zeigen jetzt „— unkategorisiert —“
 
 ### Technik
 
@@ -28,6 +30,8 @@
 - Frontend-Tests für Einstellungen, Upload-Duplikate, Theme-Service, API-Service und Verlauf (Funktions-Coverage 50 % → 86 %); Coverage-Schwellen entsprechend angehoben
 - Services werden in Komponenten per `inject()` statt `new` bezogen
 - Dependabot: wöchentliche Update-PRs für npm (gruppiert: Angular, Lint, Vitest, Minor/Patch), GitHub Actions und das Docker-Basisimage; Node-Majors werden bewusst ausgelassen
+- GitHub Actions aktualisiert (`actions/checkout`, `actions/setup-node`, `actions/upload-artifact` auf v7)
+- Release-Workflow: Release Notes werden jetzt korrekt aus dem passenden CHANGELOG-Abschnitt übernommen (waren bisher immer leer)
 
 ## 1.0.0 (2026-11-05)
 

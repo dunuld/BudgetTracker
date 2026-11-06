@@ -1,4 +1,12 @@
-import { Component, effect, input, ViewChild, ElementRef, afterNextRender, OnDestroy } from '@angular/core';
+import {
+  Component,
+  effect,
+  input,
+  ViewChild,
+  ElementRef,
+  afterNextRender,
+  OnDestroy,
+} from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
@@ -15,7 +23,11 @@ function getThemeColors(): { textColor: string; gridColor: string } {
   selector: 'app-chart',
   standalone: true,
   template: `<canvas #canvas></canvas>`,
-  styles: `canvas { max-width: 100%; }`,
+  styles: `
+    canvas {
+      max-width: 100%;
+    }
+  `,
 })
 export default class ChartComponent implements OnDestroy {
   readonly type = input.required<'doughnut' | 'bar'>();
@@ -68,18 +80,19 @@ export default class ChartComponent implements OnDestroy {
           },
         },
       },
-      scales: type === 'bar'
-        ? {
-            x: {
-              ticks: { color: theme.textColor },
-              grid: { color: theme.gridColor },
-            },
-            y: {
-              ticks: { color: theme.textColor },
-              grid: { color: theme.gridColor },
-            },
-          }
-        : undefined,
+      scales:
+        type === 'bar'
+          ? {
+              x: {
+                ticks: { color: theme.textColor },
+                grid: { color: theme.gridColor },
+              },
+              y: {
+                ticks: { color: theme.textColor },
+                grid: { color: theme.gridColor },
+              },
+            }
+          : undefined,
       ...this.options(),
     };
 

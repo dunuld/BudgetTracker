@@ -8,6 +8,6 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withFetch()),
     // Hash-Routing: der Server muss unter HA-Ingress keine Deep-Links kennen
-    provideRouter(routes, withHashLocation())
-  ]
+    provideRouter(routes, withHashLocation()),
+  ],
 };

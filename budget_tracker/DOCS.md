@@ -16,26 +16,31 @@ Ein HomeAssistant-Addon zum Verwalten des gemeinsamen Haushaltsbudgets. Monatlic
 ## Nutzung
 
 ### PDF hochladen
+
 1. Im Menü auf **Upload** klicken.
 2. Den ING-Kontoauszug als PDF auswählen und hochladen.
 3. Nach dem Import siehst du: Zeitraum, Anzahl Buchungen, Saldo-Prüfung und Anzahl der automatisch kategorisierten Buchungen.
 
 ### Monatsübersicht
+
 - Die Startseite zeigt Einnahmen, Ausgaben und Saldo des aktuellen Monats.
 - Ein Donut-Diagramm visualisiert die Ausgaben nach Kategorie.
 - Klick auf eine Kategorie öffnet die gefilterte Transaktionsliste.
 - Mit den Pfeilen kannst du zwischen Monaten navigieren.
 
 ### Transaktionen
+
 - Alle Buchungen filterbar nach Monat, Kategorie und Freitext.
 - Kategorie einer Buchung direkt ändern.
 - Optional: Neue Regel für den Empfänger anlegen, damit künftige Buchungen automatisch zugeordnet werden.
 
 ### Verlauf
+
 - Mehrere Monate vergleichen mit einem gestapelten Balkendiagramm.
 - Zeitraum über die Monatsauswähler festlegen.
 
 ### Einstellungen
+
 - **Kategorien**: Neue Kategorien anlegen (Name, Farbe, Typ) oder bestehende löschen.
 - **Regeln**: Kategorisierungsregeln verwalten (Feld, Match-Typ, Muster, Priorität). „Regeln neu anwenden" aktualisiert alle nicht-manuell zugeordneten Buchungen.
 - **Auszüge**: Importierte Kontoauszüge auflisten und löschen.
@@ -43,6 +48,7 @@ Ein HomeAssistant-Addon zum Verwalten des gemeinsamen Haushaltsbudgets. Monatlic
 ## Datenspeicherung
 
 Alle Daten werden lokal im Addon-Container unter `/data` gespeichert:
+
 - `budget.db` – SQLite-Datenbank mit Kategorien, Regeln, Auszügen und Transaktionen.
 - `uploads/` – Original-PDFs der hochgeladenen Kontoauszüge.
 

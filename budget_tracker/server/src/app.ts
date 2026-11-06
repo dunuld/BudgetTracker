@@ -109,7 +109,8 @@ export function createApp(db: Database, options: AppOptions = {}): Express {
     const status = typeof err?.status === 'number' ? err.status : 500;
     if (status >= 500) console.error(err);
     const body: ApiError = {
-      error: status >= 500 ? 'Interner Serverfehler' : String(err?.message ?? 'Fehlerhafte Anfrage'),
+      error:
+        status >= 500 ? 'Interner Serverfehler' : String(err?.message ?? 'Fehlerhafte Anfrage'),
     };
     res.status(status).json(body);
   };

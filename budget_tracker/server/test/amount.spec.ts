@@ -64,8 +64,14 @@ describe('Monate', () => {
 describe('removeChunkSpaces', () => {
   it.each([
     // eingefügter Trenner mitten im Wort
-    ['Alte Leipziger Lebensversicherung a uf Gegenseitigkeit', 'Alte Leipziger Lebensversicherung auf Gegenseitigkeit'],
-    ['ZURICH LIFE ASSURANCE PUBLIC LIMITE D COMPANY', 'ZURICH LIFE ASSURANCE PUBLIC LIMITED COMPANY'],
+    [
+      'Alte Leipziger Lebensversicherung a uf Gegenseitigkeit',
+      'Alte Leipziger Lebensversicherung auf Gegenseitigkeit',
+    ],
+    [
+      'ZURICH LIFE ASSURANCE PUBLIC LIMITE D COMPANY',
+      'ZURICH LIFE ASSURANCE PUBLIC LIMITED COMPANY',
+    ],
     // mehrere Blöcke, Prüfung an der nächsten Blockgrenze
     [
       'Rundfunk 10.2026 - 12.2026 Beitrags nr. 238906216 Aenderungen ganz bequ em: www.rundfunkbeitrag.de',

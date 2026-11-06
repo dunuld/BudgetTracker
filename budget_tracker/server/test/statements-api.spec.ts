@@ -30,9 +30,12 @@ afterEach(() => {
 });
 
 const upload = (file: Buffer, name = FILE_NAME, query = '') =>
-  request(app).post(`/api/statements${query}`).attach('file', file, { filename: name, contentType: 'application/pdf' });
+  request(app)
+    .post(`/api/statements${query}`)
+    .attach('file', file, { filename: name, contentType: 'application/pdf' });
 
-const count = (sql: string, ...params: (string | number)[]) => Number(db.prepare(sql).get(...params)?.['n']);
+const count = (sql: string, ...params: (string | number)[]) =>
+  Number(db.prepare(sql).get(...params)?.['n']);
 
 describe('POST api/statements', () => {
   it('importiert den ING-Auszug und liefert das Import-Ergebnis', async () => {
@@ -61,10 +64,14 @@ describe('POST api/statements', () => {
     // uncategorizedCount variiert je nach Seed-Regeln; mindestens 0
     expect(result.uncategorizedCount).toBeGreaterThanOrEqual(0);
 
-    expect(count('SELECT COUNT(*) AS n FROM transactions WHERE statement_id = ?', result.statement.id)).toBe(19);
+    expect(
+      count('SELECT COUNT(*) AS n FROM transactions WHERE statement_id = ?', result.statement.id),
+    ).toBe(19);
     // Alle Buchungen haben eine Kategorie (entweder per Regel oder Default)
     expect(count('SELECT COUNT(*) AS n FROM transactions WHERE category_id IS NOT NULL')).toBe(19);
-    expect(Number(db.prepare('SELECT SUM(amount_cents) AS n FROM transactions').get()?.['n'])).toBe(311034);
+    expect(Number(db.prepare('SELECT SUM(amount_cents) AS n FROM transactions').get()?.['n'])).toBe(
+      311034,
+    );
 
     const stored = join(uploadsDir, `${fixtureHash}.pdf`);
     expect(readFileSync(stored).equals(fixture)).toBe(true);
@@ -74,10 +81,14 @@ describe('POST api/statements', () => {
     const first = (await upload(fixture).expect(201)).body as ImportResult;
 
     const duplicate = await upload(fixture).expect(409);
-    expect(duplicate.body).toMatchObject({ code: 'DUPLICATE_STATEMENT', existing: { id: first.statement.id, month: 10, year: 2026 } });
+    expect(duplicate.body).toMatchObject({
+      code: 'DUPLICATE_STATEMENT',
+      existing: { id: first.statement.id, month: 10, year: 2026 },
+    });
     expect(duplicate.body.error).toContain('10/2026');
 
-    const replaced = (await upload(fixture, 'neu.pdf', '?replace=true').expect(201)).body as ImportResult;
+    const replaced = (await upload(fixture, 'neu.pdf', '?replace=true').expect(201))
+      .body as ImportResult;
     expect(replaced.statement.fileName).toBe('neu.pdf');
     expect(replaced.transactionCount).toBe(19);
 

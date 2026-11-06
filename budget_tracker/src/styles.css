@@ -39,7 +39,7 @@
 }
 
 /* Dark theme */
-[data-theme="dark"] {
+[data-theme='dark'] {
   --bt-bg: #1e1e1e;
   --bt-bg-secondary: #2c2c2c;
   --bt-bg-tertiary: #3c3c3c;
@@ -76,7 +76,7 @@
 
 /* Auto-detect system preference when no explicit theme is set */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-theme='light']) {
     --bt-bg: #1e1e1e;
     --bt-bg-secondary: #2c2c2c;
     --bt-bg-tertiary: #3c3c3c;

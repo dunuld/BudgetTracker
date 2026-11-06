@@ -15,9 +15,30 @@ describe('OverviewComponent', () => {
     expenseCents: -120000,
     balanceCents: 180000,
     categories: [
-      { categoryId: 1, name: 'Lebensmittel', color: '#4caf50', kind: 'expense', totalCents: -50000, count: 12 },
-      { categoryId: 2, name: 'Miete', color: '#f44336', kind: 'expense', totalCents: -70000, count: 1 },
-      { categoryId: 3, name: 'Gehalt', color: '#03a9f4', kind: 'income', totalCents: 300000, count: 1 },
+      {
+        categoryId: 1,
+        name: 'Lebensmittel',
+        color: '#4caf50',
+        kind: 'expense',
+        totalCents: -50000,
+        count: 12,
+      },
+      {
+        categoryId: 2,
+        name: 'Miete',
+        color: '#f44336',
+        kind: 'expense',
+        totalCents: -70000,
+        count: 1,
+      },
+      {
+        categoryId: 3,
+        name: 'Gehalt',
+        color: '#03a9f4',
+        kind: 'income',
+        totalCents: 300000,
+        count: 1,
+      },
     ],
   });
 
@@ -37,7 +58,7 @@ describe('OverviewComponent', () => {
     const fixture = TestBed.createComponent(OverviewComponent);
     fixture.detectChanges();
     expect(fixture.componentInstance).toBeTruthy();
-    const req = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req.flush({} as MonthlyReport);
   });
 
@@ -46,7 +67,7 @@ describe('OverviewComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.loading')?.textContent).toContain('Lade Daten');
-    const req = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req.flush({} as MonthlyReport);
   });
 
@@ -56,7 +77,7 @@ describe('OverviewComponent', () => {
     fixture.detectChanges();
 
     const mockReport = createMockReport();
-    const req = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req.flush(mockReport);
     await fixture.whenStable();
     fixture.detectChanges();
@@ -74,7 +95,7 @@ describe('OverviewComponent', () => {
     fixture.detectChanges();
 
     const mockReport = createMockReport();
-    const req = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req.flush(mockReport);
     await fixture.whenStable();
     fixture.detectChanges();
@@ -87,7 +108,7 @@ describe('OverviewComponent', () => {
     const fixture = TestBed.createComponent(OverviewComponent);
     fixture.detectChanges();
 
-    const req = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req.error(new ProgressEvent('error'));
     await fixture.whenStable();
     fixture.detectChanges();
@@ -101,19 +122,19 @@ describe('OverviewComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    const req = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req.flush({} as MonthlyReport);
 
     component.prevMonth();
     expect(component.currentMonth()).toBeLessThanOrEqual(12);
 
-    const req2 = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req2 = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req2.flush({} as MonthlyReport);
 
     component.nextMonth();
     expect(component.currentMonth()).toBeGreaterThanOrEqual(1);
 
-    const req3 = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req3 = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req3.flush({} as MonthlyReport);
   });
 
@@ -122,7 +143,7 @@ describe('OverviewComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    const req = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req.flush({} as MonthlyReport);
 
     component.currentMonth.set(1);
@@ -131,7 +152,7 @@ describe('OverviewComponent', () => {
     expect(component.currentMonth()).toBe(12);
     expect(component.currentYear()).toBe(2023);
 
-    const req2 = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req2 = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req2.flush({} as MonthlyReport);
   });
 
@@ -140,7 +161,7 @@ describe('OverviewComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    const req = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req.flush({} as MonthlyReport);
 
     component.currentMonth.set(12);
@@ -149,7 +170,7 @@ describe('OverviewComponent', () => {
     expect(component.currentMonth()).toBe(1);
     expect(component.currentYear()).toBe(2025);
 
-    const req2 = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req2 = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req2.flush({} as MonthlyReport);
   });
 
@@ -164,10 +185,17 @@ describe('OverviewComponent', () => {
       expenseCents: 0,
       balanceCents: 300000,
       categories: [
-        { categoryId: 3, name: 'Gehalt', color: '#03a9f4', kind: 'income', totalCents: 300000, count: 1 },
+        {
+          categoryId: 3,
+          name: 'Gehalt',
+          color: '#03a9f4',
+          kind: 'income',
+          totalCents: 300000,
+          count: 1,
+        },
       ],
     };
-    const req = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req.flush(mockReport);
     await fixture.whenStable();
     fixture.detectChanges();
@@ -182,7 +210,7 @@ describe('OverviewComponent', () => {
     expect(component.formatEuro(123456)).toContain('1.234,56');
     expect(component.formatEuro(-5000)).toContain('-50,00');
 
-    const req = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req.flush({} as MonthlyReport);
   });
 
@@ -192,7 +220,7 @@ describe('OverviewComponent', () => {
     expect(component.formatMonthYear(2024, 1)).toBe('Januar 2024');
     expect(component.formatMonthYear(2024, 12)).toBe('Dezember 2024');
 
-    const req = httpMock.expectOne(req => req.url.includes('api/reports/monthly'));
+    const req = httpMock.expectOne((req) => req.url.includes('api/reports/monthly'));
     req.flush({} as MonthlyReport);
   });
 });

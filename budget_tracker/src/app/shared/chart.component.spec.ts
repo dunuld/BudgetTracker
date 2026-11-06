@@ -5,13 +5,7 @@ import ChartComponent from './chart.component';
 @Component({
   standalone: true,
   imports: [ChartComponent],
-  template: `
-    <app-chart
-      [type]="type"
-      [labels]="labels"
-      [datasets]="datasets"
-    ></app-chart>
-  `,
+  template: ` <app-chart [type]="type" [labels]="labels" [datasets]="datasets"></app-chart> `,
 })
 class TestHostComponent {
   type: 'doughnut' | 'bar' = 'doughnut';
@@ -76,9 +70,7 @@ describe('ChartComponent', () => {
     const fixture = TestBed.createComponent(TestHostComponent);
     fixture.componentInstance.type = 'doughnut';
     fixture.componentInstance.labels = ['X'];
-    fixture.componentInstance.datasets = [
-      { label: 'L', data: [1], backgroundColor: '#fff' },
-    ];
+    fixture.componentInstance.datasets = [{ label: 'L', data: [1], backgroundColor: '#fff' }];
     fixture.detectChanges();
     expect(() => fixture.destroy()).not.toThrow();
   });

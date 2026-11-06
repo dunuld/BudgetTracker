@@ -71,10 +71,11 @@ describe('ING-Parser mit synthetischem Kontoauszug', () => {
   });
 
   it('setzt umgebrochene Empfängernamen zusammen', () => {
-    const names = statement.transactions.map((t) => t.counterparty);
     // Alte Leipziger: Name ist 34 Zeichen (< SEPA_CHUNK=35), daher wird die Fortsetzung
     // nicht als Name erkannt, sondern als Verwendungszweck
-    const alteLeipziger = statement.transactions.find((t) => t.counterparty === 'Alte Leipziger Lebensversicherung');
+    const alteLeipziger = statement.transactions.find(
+      (t) => t.counterparty === 'Alte Leipziger Lebensversicherung',
+    );
     expect(alteLeipziger).toBeDefined();
     expect(alteLeipziger!.purpose).toContain('auf Gegenseitigkeit');
 
@@ -84,7 +85,10 @@ describe('ING-Parser mit synthetischem Kontoauszug', () => {
     expect(notar?.purpose).toContain('R1495/0/1-2026');
 
     const netflix = statement.transactions.find((t) => t.purpose.includes('Netflix'));
-    expect(netflix).toMatchObject({ counterparty: 'PayPal Europe S.a.r.l. et Cie S.C.A', amountCents: -2499 });
+    expect(netflix).toMatchObject({
+      counterparty: 'PayPal Europe S.a.r.l. et Cie S.C.A',
+      amountCents: -2499,
+    });
     expect(netflix?.purpose).toContain('Netflix.com, Ihr Einkauf bei Netflix.com');
   });
 
@@ -98,7 +102,11 @@ describe('ING-Parser mit synthetischem Kontoauszug', () => {
 
   it('übernimmt abweichende Valuta und leere Verwendungszwecke', () => {
     const refund = statement.transactions.find((t) => t.amountCents === 1295);
-    expect(refund).toMatchObject({ type: 'Gutschrift', bookingDate: '2026-10-21', valueDate: '2026-10-20' });
+    expect(refund).toMatchObject({
+      type: 'Gutschrift',
+      bookingDate: '2026-10-21',
+      valueDate: '2026-10-20',
+    });
     const transfer = statement.transactions.find((t) => t.amountCents === 275075);
     expect(transfer).toMatchObject({ counterparty: 'Anna Bergmann', purpose: '' });
   });
@@ -146,11 +154,31 @@ function synthetic(): TextLine[] {
     line(1, 615, [312, 'Neuer Saldo'], [488, '1.050,00 Euro']),
     line(1, 597, [312, 'IBAN'], [408, 'DE12 5001 0517 1234 5678 90']),
     ...header(1).slice(1),
-    line(1, 600, [71, '02.03.2026'], [142, 'Gutschrift'], [192, 'Arbeitgeber GmbH'], amount('2.000,00')),
+    line(
+      1,
+      600,
+      [71, '02.03.2026'],
+      [142, 'Gutschrift'],
+      [192, 'Arbeitgeber GmbH'],
+      amount('2.000,00'),
+    ),
     line(1, 588, [71, '02.03.2026'], [142, 'Gehalt Maerz']),
     // Art und Empfänger in einem Textstück, ohne Valuta-Zeile
-    line(1, 570, [71, '03.03.2026'], [142, 'Lastschrift NETFLIX INTERNATIONAL B.V.'], amount('-12,99')),
-    line(1, 550, [71, '04.03.2026'], [142, 'Lastschrift'], [195, 'Stadtwerke Musterstadt'], amount('-1.937,01')),
+    line(
+      1,
+      570,
+      [71, '03.03.2026'],
+      [142, 'Lastschrift NETFLIX INTERNATIONAL B.V.'],
+      amount('-12,99'),
+    ),
+    line(
+      1,
+      550,
+      [71, '04.03.2026'],
+      [142, 'Lastschrift'],
+      [195, 'Stadtwerke Musterstadt'],
+      amount('-1.937,01'),
+    ),
     line(1, 538, [71, '05.03.2026'], [142, 'Abschlag Strom Vertragskonto 4711']),
     ...footer(1),
     // Fortsetzung der Buchung auf der nächsten Seite
@@ -205,7 +233,12 @@ describe('ING-Parser mit synthetischen Zeilen', () => {
   });
 
   it('erkennt fremde Dokumente nicht als ING-Auszug', () => {
-    expect(parser.canParse([line(1, 700, [71, 'Sparkasse Musterstadt']), line(1, 680, [71, 'Kontoauszug März 2026'])])).toBe(false);
+    expect(
+      parser.canParse([
+        line(1, 700, [71, 'Sparkasse Musterstadt']),
+        line(1, 680, [71, 'Kontoauszug März 2026']),
+      ]),
+    ).toBe(false);
     expect(parser.canParse([line(1, 700, [71, 'ING-DiBa AG · Rechnung'])])).toBe(false);
   });
 

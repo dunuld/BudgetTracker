@@ -9,40 +9,62 @@
 
   <select [value]="categoryId() ?? ''" (change)="onFilterCategoryChange($event)">
     <option value="">Alle Kategorien</option>
-    <option *ngFor="let c of categories()" [value]="c.id">{{ c.name }}</option>
+    @for (c of categories(); track c) {
+      <option [value]="c.id">{{ c.name }}</option>
+    }
   </select>
 
-  <input type="text" placeholder="Suchen …" [value]="search()" (input)="onSearchChange($event)" class="search-input">
+  <input
+    type="text"
+    placeholder="Suchen …"
+    [value]="search()"
+    (input)="onSearchChange($event)"
+    class="search-input"
+  />
 </div>
 
-<div *ngIf="error()" class="error">{{ error() }}</div>
-<div *ngIf="loading()" class="loading">Laden …</div>
+@if (error()) {
+  <div class="error">{{ error() }}</div>
+}
+@if (loading()) {
+  <div class="loading">Laden …</div>
+}
 
-<table *ngIf="!loading() && transactions().length">
-  <thead>
-    <tr>
-      <th>Datum</th>
-      <th>Art</th>
-      <th>Empfänger</th>
-      <th>Verwendungszweck</th>
-      <th>Betrag</th>
-      <th>Kategorie</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let tx of transactions()">
-      <td>{{ tx.bookingDate | date:'dd.MM.yyyy' }}</td>
-      <td>{{ tx.type }}</td>
-      <td>{{ tx.counterparty }}</td>
-      <td class="purpose">{{ tx.purpose }}</td>
-      <td class="amount" [class.positive]="tx.amountCents > 0">{{ formatEuro(tx.amountCents) }}</td>
-      <td>
-        <select [value]="tx.categoryId ?? ''" (change)="onCategoryChange(tx, $event)">
-          <option *ngFor="let c of categories()" [value]="c.id" [style.color]="c.color">{{ c.name }}</option>
-        </select>
-      </td>
-    </tr>
-  </tbody>
-</table>
+@if (!loading() && transactions().length) {
+  <table>
+    <thead>
+      <tr>
+        <th>Datum</th>
+        <th>Art</th>
+        <th>Empfänger</th>
+        <th>Verwendungszweck</th>
+        <th>Betrag</th>
+        <th>Kategorie</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (tx of transactions(); track tx) {
+        <tr>
+          <td>{{ tx.bookingDate | date: 'dd.MM.yyyy' }}</td>
+          <td>{{ tx.type }}</td>
+          <td>{{ tx.counterparty }}</td>
+          <td class="purpose">{{ tx.purpose }}</td>
+          <td class="amount" [class.positive]="tx.amountCents > 0">
+            {{ formatEuro(tx.amountCents) }}
+          </td>
+          <td>
+            <select [value]="tx.categoryId ?? ''" (change)="onCategoryChange(tx, $event)">
+              @for (c of categories(); track c) {
+                <option [value]="c.id" [style.color]="c.color">{{ c.name }}</option>
+              }
+            </select>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
 
-<p *ngIf="!loading() && !transactions().length && !error()">Keine Transaktionen gefunden.</p>
+@if (!loading() && !transactions().length && !error()) {
+  <p>Keine Transaktionen gefunden.</p>
+}

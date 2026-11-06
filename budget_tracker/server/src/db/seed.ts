@@ -100,7 +100,13 @@ export const SEED_CATEGORIES: SeedCategory[] = [
     name: 'Telekommunikation',
     color: '#00bcd4',
     kind: 'expense',
-    rules: [contains('TELEKOM'), contains('VODAFONE'), word('O2'), contains('TELEFONICA'), contains('1&1')],
+    rules: [
+      contains('TELEKOM'),
+      contains('VODAFONE'),
+      word('O2'),
+      contains('TELEFONICA'),
+      contains('1&1'),
+    ],
   },
   {
     name: 'Mobilität',
@@ -124,13 +130,22 @@ export const SEED_CATEGORIES: SeedCategory[] = [
     name: 'Bargeld',
     color: '#8bc34a',
     kind: 'expense',
-    rules: [contains('GELDAUTOMAT', 40), contains('BARGELDAUSZAHLUNG', 40), contains('BARGELD', 45)],
+    rules: [
+      contains('GELDAUTOMAT', 40),
+      contains('BARGELDAUSZAHLUNG', 40),
+      contains('BARGELD', 45),
+    ],
   },
   {
     name: 'Einnahmen',
     color: '#2e7d32',
     kind: 'income',
-    rules: [contains('GEHALT', 20), word('LOHN', 20), contains('KINDERGELD', 20), contains('FAMILIENKASSE', 20)],
+    rules: [
+      contains('GEHALT', 20),
+      word('LOHN', 20),
+      contains('KINDERGELD', 20),
+      contains('FAMILIENKASSE', 20),
+    ],
   },
   {
     name: 'Umbuchungen',

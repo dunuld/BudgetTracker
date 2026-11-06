@@ -1,6 +1,6 @@
 import { Router, type RequestHandler } from 'express';
 import multer from 'multer';
-import { HttpError, badRequest } from '../http-error.js';
+import { HttpError, badRequest, parseId } from '../http-error.js';
 import type { ImportService } from '../services/import.service.js';
 
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
@@ -23,12 +23,6 @@ const singleFile: RequestHandler = (req, res, next) => {
     next(error);
   });
 };
-
-export function parseId(value: unknown): number {
-  const id = Number(value);
-  if (!Number.isSafeInteger(id) || id <= 0) throw badRequest('Ungültige ID');
-  return id;
-}
 
 const isTrue = (value: unknown): boolean => value === 'true' || value === '1';
 

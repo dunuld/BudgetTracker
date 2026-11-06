@@ -1,8 +1,15 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/api.service.js';
 import { formatDate as fmtDate } from '../../core/format.js';
-import type { Category, CategoryInput, Rule, RuleInput, Statement } from '../../../../shared/api-types';
+import type {
+  Category,
+  CategoryInput,
+  Rule,
+  RuleInput,
+  Statement,
+} from '../../../../shared/api-types';
 import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/api-types';
 
 @Component({
@@ -13,9 +20,23 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
     <h2>Einstellungen</h2>
 
     <div class="tabs">
-      <button class="tab" [class.active]="activeTab() === 'categories'" (click)="activeTab.set('categories')">Kategorien</button>
-      <button class="tab" [class.active]="activeTab() === 'rules'" (click)="activeTab.set('rules')">Regeln</button>
-      <button class="tab" [class.active]="activeTab() === 'statements'" (click)="activeTab.set('statements')">Auszüge</button>
+      <button
+        class="tab"
+        [class.active]="activeTab() === 'categories'"
+        (click)="activeTab.set('categories')"
+      >
+        Kategorien
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'rules'" (click)="activeTab.set('rules')">
+        Regeln
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab() === 'statements'"
+        (click)="activeTab.set('statements')"
+      >
+        Auszüge
+      </button>
     </div>
 
     @if (activeTab() === 'categories') {
@@ -47,9 +68,13 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
                   <td>
                     <span class="color-dot" [style.background]="cat.color"></span>
                     {{ cat.name }}
-                    @if (cat.isDefault) { <span class="badge">Standard</span> }
+                    @if (cat.isDefault) {
+                      <span class="badge">Standard</span>
+                    }
                   </td>
-                  <td><code>{{ cat.color }}</code></td>
+                  <td>
+                    <code>{{ cat.color }}</code>
+                  </td>
                   <td>{{ kindLabel(cat.kind) }}</td>
                   <td>
                     @if (!cat.isDefault) {
@@ -69,7 +94,9 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
         <button class="btn-secondary" (click)="reapplyRules()" [disabled]="reapplying()">
           {{ reapplying() ? 'Wende an …' : 'Regeln neu anwenden' }}
         </button>
-        @if (reapplyMsg()) { <span class="success-msg">{{ reapplyMsg() }}</span> }
+        @if (reapplyMsg()) {
+          <span class="success-msg">{{ reapplyMsg() }}</span>
+        }
 
         <div class="form-row">
           <select #ruleCat [(ngModel)]="newRuleCat" class="input">
@@ -88,7 +115,9 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
             <option value="regex">Regex</option>
           </select>
           <input #rulePattern placeholder="Muster" [(ngModel)]="newRulePattern" class="input" />
-          <button class="btn-primary" (click)="addRule(ruleCat, ruleField, ruleMatch, rulePattern)">Hinzufügen</button>
+          <button class="btn-primary" (click)="addRule(ruleCat, ruleField, ruleMatch, rulePattern)">
+            Hinzufügen
+          </button>
         </div>
 
         @if (rules().length > 0) {
@@ -109,7 +138,9 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
                   <td>{{ categoryName(rule.categoryId) }}</td>
                   <td>{{ fieldLabel(rule.field) }}</td>
                   <td>{{ rule.matchType }}</td>
-                  <td><code>{{ rule.pattern }}</code></td>
+                  <td>
+                    <code>{{ rule.pattern }}</code>
+                  </td>
                   <td>{{ rule.priority }}</td>
                   <td>
                     <button class="btn-danger" (click)="deleteRule(rule.id)">Löschen</button>
@@ -139,7 +170,9 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
               @for (s of statements(); track s.id) {
                 <tr>
                   <td>{{ monthYearLabel(s.year, s.month) }}</td>
-                  <td><code>{{ s.iban }}</code></td>
+                  <td>
+                    <code>{{ s.iban }}</code>
+                  </td>
                   <td>{{ s.transactionCount }}</td>
                   <td>{{ formatDate(s.importedAt) }}</td>
                   <td>
@@ -182,7 +215,9 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
       font-weight: 600;
     }
 
-    .tab-content { padding-top: 0.5rem; }
+    .tab-content {
+      padding-top: 0.5rem;
+    }
 
     .form-row {
       display: flex;
@@ -226,7 +261,10 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
       font-size: 0.9rem;
       margin-bottom: 1rem;
     }
-    .btn-secondary:disabled { opacity: 0.5; cursor: default; }
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
     .btn-danger {
       background: #f44336;
       color: white;
@@ -237,10 +275,29 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
       font-size: 0.85rem;
     }
 
-    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
-    th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--bt-border); }
-    th { font-size: 0.85rem; color: var(--bt-text-secondary); font-weight: 600; }
-    code { background: var(--bt-code-bg); padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.85rem; color: var(--bt-text); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    th,
+    td {
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--bt-border);
+    }
+    th {
+      font-size: 0.85rem;
+      color: var(--bt-text-secondary);
+      font-weight: 600;
+    }
+    code {
+      background: var(--bt-code-bg);
+      padding: 0.1rem 0.3rem;
+      border-radius: 3px;
+      font-size: 0.85rem;
+      color: var(--bt-text);
+    }
 
     .color-dot {
       display: inline-block;
@@ -260,9 +317,21 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
       margin-left: 0.5rem;
     }
 
-    .success-msg { color: var(--bt-success-text); font-size: 0.9rem; margin-left: 0.5rem; }
-    .error-msg { color: var(--bt-error-text); font-size: 0.9rem; margin-top: 0.5rem; }
-    .empty { color: var(--bt-text-muted); text-align: center; padding: 2rem; }
+    .success-msg {
+      color: var(--bt-success-text);
+      font-size: 0.9rem;
+      margin-left: 0.5rem;
+    }
+    .error-msg {
+      color: var(--bt-error-text);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    .empty {
+      color: var(--bt-text-muted);
+      text-align: center;
+      padding: 2rem;
+    }
   `,
 })
 export default class SettingsComponent {
@@ -318,7 +387,11 @@ export default class SettingsComponent {
     });
   }
 
-  addCategory(nameInput: HTMLInputElement, colorInput: HTMLInputElement, kindInput: HTMLSelectElement) {
+  addCategory(
+    nameInput: HTMLInputElement,
+    colorInput: HTMLInputElement,
+    kindInput: HTMLSelectElement,
+  ) {
     const name = nameInput.value.trim();
     if (!name) return;
     const input: CategoryInput = {
@@ -331,7 +404,8 @@ export default class SettingsComponent {
         this.categories.update((cats) => [...cats, cat]);
         nameInput.value = '';
       },
-      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Erstellen'),
+      error: (err: HttpErrorResponse) =>
+        this.errorMsg.set(err.error?.error ?? 'Fehler beim Erstellen'),
     });
   }
 
@@ -342,7 +416,8 @@ export default class SettingsComponent {
         this.categories.update((cats) => cats.filter((c) => c.id !== id));
         this.loadRules();
       },
-      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
+      error: (err: HttpErrorResponse) =>
+        this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
     });
   }
 
@@ -366,7 +441,8 @@ export default class SettingsComponent {
         this.rules.update((rules) => [...rules, rule]);
         patternInput.value = '';
       },
-      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Erstellen'),
+      error: (err: HttpErrorResponse) =>
+        this.errorMsg.set(err.error?.error ?? 'Fehler beim Erstellen'),
     });
   }
 
@@ -375,7 +451,8 @@ export default class SettingsComponent {
       next: () => {
         this.rules.update((rules) => rules.filter((r) => r.id !== id));
       },
-      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
+      error: (err: HttpErrorResponse) =>
+        this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
     });
   }
 
@@ -400,7 +477,8 @@ export default class SettingsComponent {
       next: () => {
         this.statements.update((stmts) => stmts.filter((s) => s.id !== id));
       },
-      error: (err: any) => this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
+      error: (err: HttpErrorResponse) =>
+        this.errorMsg.set(err.error?.error ?? 'Fehler beim Löschen'),
     });
   }
 
@@ -410,22 +488,41 @@ export default class SettingsComponent {
 
   kindLabel(kind: CategoryKind): string {
     switch (kind) {
-      case 'expense': return 'Ausgabe';
-      case 'income': return 'Einnahme';
-      case 'transfer': return 'Umbuchung';
+      case 'expense':
+        return 'Ausgabe';
+      case 'income':
+        return 'Einnahme';
+      case 'transfer':
+        return 'Umbuchung';
     }
   }
 
   fieldLabel(field: RuleField): string {
     switch (field) {
-      case 'counterparty': return 'Empfänger';
-      case 'purpose': return 'Verwendungszweck';
-      case 'any': return 'Beides';
+      case 'counterparty':
+        return 'Empfänger';
+      case 'purpose':
+        return 'Verwendungszweck';
+      case 'any':
+        return 'Beides';
     }
   }
 
   monthYearLabel(year: number, month: number): string {
-    const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mär',
+      'Apr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Dez',
+    ];
     return `${months[month - 1]} ${year}`;
   }
 

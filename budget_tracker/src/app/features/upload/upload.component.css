@@ -1,4 +1,6 @@
-h2 { margin: 0 0 1rem; }
+h2 {
+  margin: 0 0 1rem;
+}
 
 .upload-area {
   display: flex;
@@ -22,13 +24,22 @@ h2 { margin: 0 0 1rem; }
   color: var(--bt-text);
 }
 
-.drop-zone:hover { border-color: var(--bt-primary); }
+.drop-zone:hover {
+  border-color: var(--bt-primary);
+}
 
-.drop-zone .icon { font-size: 2rem; }
+.drop-zone .icon {
+  font-size: 2rem;
+}
 
-.file-name { color: var(--bt-text-secondary); font-size: 0.9rem; }
+.file-name {
+  color: var(--bt-text-secondary);
+  font-size: 0.9rem;
+}
 
-.loading { color: var(--bt-text-muted); }
+.loading {
+  color: var(--bt-text-muted);
+}
 
 .error {
   background: var(--bt-error-bg);
@@ -46,7 +57,10 @@ h2 { margin: 0 0 1rem; }
   color: var(--bt-text);
 }
 
-.result h3 { margin: 0 0 0.8rem; color: var(--bt-success-text); }
+.result h3 {
+  margin: 0 0 0.8rem;
+  color: var(--bt-success-text);
+}
 
 .result dl {
   display: grid;
@@ -55,7 +69,10 @@ h2 { margin: 0 0 1rem; }
   margin: 0;
 }
 
-.result dt { font-weight: 600; color: var(--bt-text-secondary); }
+.result dt {
+  font-weight: 600;
+  color: var(--bt-text-secondary);
+}
 
 .warning {
   background: var(--bt-warning-bg);
@@ -65,4 +82,6 @@ h2 { margin: 0 0 1rem; }
   margin-top: 0.5rem;
 }
 
-.warnings { margin-top: 0.5rem; }
+.warnings {
+  margin-top: 0.5rem;
+}

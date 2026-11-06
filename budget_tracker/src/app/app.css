@@ -1,6 +1,6 @@
 :host {
   display: block;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--ha-primary-text-color, var(--bt-text));
   background: var(--ha-primary-background-color, var(--bt-bg));
   height: 100vh;
@@ -23,7 +23,9 @@
   color: var(--ha-primary-color, var(--bt-primary));
 }
 
-.nav-spacer { flex: 1; }
+.nav-spacer {
+  flex: 1;
+}
 
 .app-nav a {
   text-decoration: none;

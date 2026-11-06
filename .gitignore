@@ -12,6 +12,7 @@ budget_tracker/bazel-out
 
 # Node
 budget_tracker/node_modules
+budget_tracker/server/node_modules
 budget_tracker/npm-debug.log
 budget_tracker/yarn-error.log
 

@@ -31,7 +31,10 @@ afterEach(() => {
 describe('Datenbank', () => {
   it('legt Schema und Seed-Kategorien inkl. Regeln an', () => {
     const db = memoryDb();
-    const names = db.prepare('SELECT name FROM categories ORDER BY sort').all().map((r) => r['name']);
+    const names = db
+      .prepare('SELECT name FROM categories ORDER BY sort')
+      .all()
+      .map((r) => r['name']);
     expect(names).toEqual(SEED_CATEGORIES.map((c) => c.name));
     expect(names).toContain('Streaming & Abos');
 
@@ -55,8 +58,14 @@ describe('Datenbank', () => {
     const db = memoryDb();
     const patterns = db.prepare(`SELECT pattern FROM rules WHERE match_type = 'regex'`).all();
     expect(patterns.length).toBeGreaterThan(0);
-    for (const { pattern } of patterns) expect(() => new RegExp(String(pattern), 'i')).not.toThrow();
-    expect(new RegExp(String(patterns.find((p) => p['pattern'] === '\\bESSO\\b')?.['pattern']), 'i').test('Espresso Bar')).toBe(false);
+    for (const { pattern } of patterns)
+      expect(() => new RegExp(String(pattern), 'i')).not.toThrow();
+    expect(
+      new RegExp(
+        String(patterns.find((p) => p['pattern'] === '\\bESSO\\b')?.['pattern']),
+        'i',
+      ).test('Espresso Bar'),
+    ).toBe(false);
   });
 
   it('seedet nur einmal und behält Änderungen bei erneutem Öffnen', () => {
@@ -88,9 +97,13 @@ describe('Datenbank', () => {
       /Standardkategorie/,
     );
 
-    const streamingId = db.prepare(`SELECT id FROM categories WHERE name = 'Streaming & Abos'`).get()?.['id'];
+    const streamingId = db
+      .prepare(`SELECT id FROM categories WHERE name = 'Streaming & Abos'`)
+      .get()?.['id'];
     const defaultId = db.prepare('SELECT id FROM categories WHERE is_default = 1').get()?.['id'];
-    const ruleId = db.prepare('SELECT id FROM rules WHERE category_id = ? LIMIT 1').get(streamingId!)?.['id'];
+    const ruleId = db
+      .prepare('SELECT id FROM rules WHERE category_id = ? LIMIT 1')
+      .get(streamingId!)?.['id'];
     const { lastInsertRowid: statementId } = db
       .prepare(
         `INSERT INTO statements (bank, iban, year, month, opening_cents, closing_cents, file_hash, file_name)
@@ -107,7 +120,13 @@ describe('Datenbank', () => {
 
     const tx = db.prepare('SELECT category_id, category_source, rule_id FROM transactions').get();
     expect(tx).toEqual({ category_id: defaultId, category_source: 'default', rule_id: null });
-    expect(Number(db.prepare('SELECT COUNT(*) AS n FROM rules WHERE category_id = ?').get(streamingId!)?.['n'])).toBe(0);
+    expect(
+      Number(
+        db.prepare('SELECT COUNT(*) AS n FROM rules WHERE category_id = ?').get(streamingId!)?.[
+          'n'
+        ],
+      ),
+    ).toBe(0);
 
     db.prepare('DELETE FROM statements').run();
     expect(Number(db.prepare('SELECT COUNT(*) AS n FROM transactions').get()?.['n'])).toBe(0);
@@ -137,7 +156,11 @@ describe('Konfiguration', () => {
 
   it('ist lokal ohne IP-Filter und per Env überschreibbar', () => {
     expect(loadConfig({}).allowedIps).toBeNull();
-    const config = loadConfig({ DB_PATH: '/tmp/x.db', ALLOWED_IPS: '10.0.0.1, 10.0.0.2', PORT: '9000' });
+    const config = loadConfig({
+      DB_PATH: '/tmp/x.db',
+      ALLOWED_IPS: '10.0.0.1, 10.0.0.2',
+      PORT: '9000',
+    });
     expect(config.dbPath).toBe('/tmp/x.db');
     expect(config.allowedIps).toEqual(['10.0.0.1', '10.0.0.2']);
     expect(config.port).toBe(9000);

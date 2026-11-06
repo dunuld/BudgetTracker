@@ -14,8 +14,22 @@ describe('SettingsComponent', () => {
   ];
 
   const createMockRules = (): Rule[] => [
-    { id: 1, categoryId: 1, field: 'counterparty', matchType: 'contains', pattern: 'REWE', priority: 1 },
-    { id: 2, categoryId: 2, field: 'purpose', matchType: 'contains', pattern: 'Miete', priority: 2 },
+    {
+      id: 1,
+      categoryId: 1,
+      field: 'counterparty',
+      matchType: 'contains',
+      pattern: 'REWE',
+      priority: 1,
+    },
+    {
+      id: 2,
+      categoryId: 2,
+      field: 'purpose',
+      matchType: 'contains',
+      pattern: 'Miete',
+      priority: 2,
+    },
   ];
 
   const createMockStatements = (): Statement[] => [
@@ -49,9 +63,9 @@ describe('SettingsComponent', () => {
     const fixture = TestBed.createComponent(SettingsComponent);
     fixture.detectChanges();
     expect(fixture.componentInstance).toBeTruthy();
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
   });
 
   it('should display the settings heading', () => {
@@ -59,9 +73,9 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h2')?.textContent).toContain('Einstellungen');
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
   });
 
   it('should display all three tabs', () => {
@@ -73,9 +87,9 @@ describe('SettingsComponent', () => {
     expect(tabs[0]?.textContent).toContain('Kategorien');
     expect(tabs[1]?.textContent).toContain('Regeln');
     expect(tabs[2]?.textContent).toContain('Auszüge');
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
   });
 
   it('should show categories tab by default', () => {
@@ -83,9 +97,9 @@ describe('SettingsComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
     expect(component.activeTab()).toBe('categories');
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
   });
 
   it('should switch to rules tab', () => {
@@ -93,9 +107,9 @@ describe('SettingsComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
 
     component.activeTab.set('rules');
     fixture.detectChanges();
@@ -107,9 +121,9 @@ describe('SettingsComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
 
     component.activeTab.set('statements');
     fixture.detectChanges();
@@ -121,9 +135,9 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
 
     const cats = createMockCategories();
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush(cats);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush(cats);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -139,9 +153,9 @@ describe('SettingsComponent', () => {
 
     const cats = createMockCategories();
     const rules = createMockRules();
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush(cats);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush(rules);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush(cats);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush(rules);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -159,9 +173,9 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
 
     const statements = createMockStatements();
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush(statements);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush(statements);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -178,9 +192,9 @@ describe('SettingsComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -199,9 +213,9 @@ describe('SettingsComponent', () => {
     const cats = createMockCategories();
     component.categories.set(cats);
 
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush(cats);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush(cats);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
 
     expect(component.categoryName(1)).toBe('Lebensmittel');
     expect(component.categoryName(999)).toBe('ID: 999');
@@ -212,9 +226,9 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
     const component = fixture.componentInstance;
     expect(component.kindLabel('expense')).toBe('Ausgabe');
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
   });
 
   it('should return kind label for income', () => {
@@ -222,9 +236,9 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
     const component = fixture.componentInstance;
     expect(component.kindLabel('income')).toBe('Einnahme');
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
   });
 
   it('should return kind label for transfer', () => {
@@ -232,9 +246,9 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
     const component = fixture.componentInstance;
     expect(component.kindLabel('transfer')).toBe('Umbuchung');
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
   });
 
   it('should return field label for counterparty', () => {
@@ -242,9 +256,9 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
     const component = fixture.componentInstance;
     expect(component.fieldLabel('counterparty')).toBe('Empfänger');
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
   });
 
   it('should return field label for purpose', () => {
@@ -252,9 +266,9 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
     const component = fixture.componentInstance;
     expect(component.fieldLabel('purpose')).toBe('Verwendungszweck');
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
   });
 
   it('should return field label for any', () => {
@@ -262,9 +276,9 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
     const component = fixture.componentInstance;
     expect(component.fieldLabel('any')).toBe('Beides');
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
   });
 
   it('should format month year label', () => {
@@ -273,18 +287,20 @@ describe('SettingsComponent', () => {
     const component = fixture.componentInstance;
     expect(component.monthYearLabel(2024, 1)).toBe('Jan 2024');
     expect(component.monthYearLabel(2024, 12)).toBe('Dez 2024');
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
   });
 
   it('should handle API error', async () => {
     const fixture = TestBed.createComponent(SettingsComponent);
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/categories')).error(new ProgressEvent('error'));
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock
+      .expectOne((req) => req.url.includes('api/categories'))
+      .error(new ProgressEvent('error'));
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -297,9 +313,9 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
 
     const cats = createMockCategories();
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush(cats);
-    httpMock.expectOne(req => req.url.includes('api/rules')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/statements')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush(cats);
+    httpMock.expectOne((req) => req.url.includes('api/rules')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/statements')).flush([]);
     await fixture.whenStable();
     fixture.detectChanges();
 

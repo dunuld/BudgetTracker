@@ -59,8 +59,8 @@ describe('TransactionsComponent', () => {
     const fixture = TestBed.createComponent(TransactionsComponent);
     fixture.detectChanges();
     expect(fixture.componentInstance).toBeTruthy();
-    httpMock.expectOne(req => req.url.includes('api/transactions')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/transactions')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
   });
 
   it('should display transactions in table', async () => {
@@ -69,8 +69,8 @@ describe('TransactionsComponent', () => {
 
     const txs = createMockTransactions();
     const cats = createMockCategories();
-    httpMock.expectOne(req => req.url.includes('api/transactions')).flush(txs);
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush(cats);
+    httpMock.expectOne((req) => req.url.includes('api/transactions')).flush(txs);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush(cats);
     await fixture.whenStable();
     fixture.detectChanges();
     await fixture.whenStable();
@@ -85,16 +85,16 @@ describe('TransactionsComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.loading')?.textContent).toContain('Laden');
-    httpMock.expectOne(req => req.url.includes('api/transactions')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/transactions')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
   });
 
   it('should show empty message when no transactions', async () => {
     const fixture = TestBed.createComponent(TransactionsComponent);
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/transactions')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/transactions')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
     await fixture.whenStable();
     fixture.detectChanges();
     await fixture.whenStable();
@@ -110,8 +110,8 @@ describe('TransactionsComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    httpMock.expectOne(req => req.url.includes('api/transactions')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/transactions')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
     await fixture.whenStable();
 
     component.month.set(1);
@@ -131,8 +131,8 @@ describe('TransactionsComponent', () => {
     fixture.detectChanges();
 
     // Flush initial effect-triggered load
-    httpMock.expectOne(req => req.url.includes('api/transactions')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/transactions')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
     await fixture.whenStable();
 
     component.categoryId.set(5);
@@ -146,8 +146,8 @@ describe('TransactionsComponent', () => {
     fixture.detectChanges();
 
     // Flush initial effect-triggered load
-    httpMock.expectOne(req => req.url.includes('api/transactions')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/transactions')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush([]);
     await fixture.whenStable();
 
     component.search.set('REWE');
@@ -163,8 +163,8 @@ describe('TransactionsComponent', () => {
     const cats = createMockCategories();
     component.categories.set(cats);
 
-    httpMock.expectOne(req => req.url.includes('api/transactions')).flush([]);
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush(cats);
+    httpMock.expectOne((req) => req.url.includes('api/transactions')).flush([]);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush(cats);
 
     expect(component.categoryName(1)).toBe('Lebensmittel');
     expect(component.categoryName(999)).toBe('—');
@@ -178,8 +178,8 @@ describe('TransactionsComponent', () => {
     const txs = createMockTransactions();
     const cats = createMockCategories();
     // Initial load triggered by effect
-    httpMock.expectOne(req => req.url.includes('api/transactions')).flush(txs);
-    httpMock.expectOne(req => req.url.includes('api/categories')).flush(cats);
+    httpMock.expectOne((req) => req.url.includes('api/transactions')).flush(txs);
+    httpMock.expectOne((req) => req.url.includes('api/categories')).flush(cats);
     await fixture.whenStable();
     fixture.detectChanges();
     await fixture.whenStable();
@@ -196,8 +196,12 @@ describe('TransactionsComponent', () => {
     fixture.detectChanges();
 
     // Both requests fail - Promise.all catches the first error
-    httpMock.expectOne(req => req.url.includes('api/transactions')).error(new ProgressEvent('error'));
-    httpMock.expectOne(req => req.url.includes('api/categories')).error(new ProgressEvent('error'));
+    httpMock
+      .expectOne((req) => req.url.includes('api/transactions'))
+      .error(new ProgressEvent('error'));
+    httpMock
+      .expectOne((req) => req.url.includes('api/categories'))
+      .error(new ProgressEvent('error'));
     await fixture.whenStable();
     await fixture.whenStable();
     fixture.detectChanges();

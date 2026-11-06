@@ -1,5 +1,4 @@
 import { Component, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { formatEuro } from '../../core/format';
@@ -7,7 +6,7 @@ import type { ImportResult } from '../../../../shared/api-types';
 
 @Component({
   selector: 'app-upload',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './upload.component.html',
   styleUrl: './upload.component.css',
 })
@@ -37,7 +36,8 @@ export default class UploadComponent {
       this.result.set(result);
     } catch (err: unknown) {
       const httpErr = err as { status?: number; error?: { error?: string; code?: string } };
-      const msg = httpErr.error?.error || (err instanceof Error ? err.message : 'Upload fehlgeschlagen');
+      const msg =
+        httpErr.error?.error || (err instanceof Error ? err.message : 'Upload fehlgeschlagen');
       if (httpErr.status === 409) {
         // Duplikat — anbieten zu ersetzen
         if (confirm(`${msg}\n\nBestehenden Auszug ersetzen?`)) {

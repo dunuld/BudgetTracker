@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { ApiService } from '../../core/api.service.js';
 import { formatEuro as fmtEuro, formatMonthYear as fmtMonthYear } from '../../core/format.js';
 import ChartComponent from '../../shared/chart.component.js';
-import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types';
+import type { MonthlyReport } from '../../../../shared/api-types';
 
 @Component({
   selector: 'app-overview',
@@ -43,12 +43,14 @@ import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types'
           <div class="chart-container">
             <app-chart
               [type]="'doughnut'"
-              [labels]="expenseCategories().map(c => c.name)"
-              [datasets]="[{
-                label: 'Ausgaben',
-                data: expenseCategories().map(c => abs(c.totalCents)),
-                backgroundColor: expenseCategories().map(c => c.color),
-              }]"
+              [labels]="expenseCategories().map((c) => c.name)"
+              [datasets]="[
+                {
+                  label: 'Ausgaben',
+                  data: expenseCategories().map((c) => abs(c.totalCents)),
+                  backgroundColor: expenseCategories().map((c) => c.color),
+                },
+              ]"
             />
           </div>
         </div>
@@ -64,7 +66,15 @@ import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types'
             </thead>
             <tbody>
               @for (cat of expenseCategories(); track cat.categoryId) {
-                <tr class="clickable" routerLink="transactions" [queryParams]="{ year: currentYear(), month: currentMonth(), categoryId: cat.categoryId }">
+                <tr
+                  class="clickable"
+                  routerLink="transactions"
+                  [queryParams]="{
+                    year: currentYear(),
+                    month: currentMonth(),
+                    categoryId: cat.categoryId,
+                  }"
+                >
                   <td>
                     <span class="color-dot" [style.background]="cat.color"></span>
                     {{ cat.name }}
@@ -92,7 +102,9 @@ import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types'
       flex-wrap: wrap;
       gap: 0.5rem;
     }
-    .page-header h2 { margin: 0; }
+    .page-header h2 {
+      margin: 0;
+    }
     .month-nav {
       display: flex;
       align-items: center;
@@ -113,7 +125,10 @@ import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types'
       cursor: pointer;
       color: var(--bt-text);
     }
-    .btn-icon:disabled { opacity: 0.4; cursor: default; }
+    .btn-icon:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
 
     .summary-cards {
       display: grid;
@@ -128,26 +143,63 @@ import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types'
       flex-direction: column;
       gap: 0.25rem;
     }
-    .card.income { background: var(--bt-card-income-bg); }
-    .card.expense { background: var(--bt-card-expense-bg); }
-    .card.balance { background: var(--bt-card-balance-bg); }
-    .card-label { font-size: 0.85rem; color: var(--bt-text-secondary); }
-    .card-value { font-size: 1.4rem; font-weight: 700; color: var(--bt-text); }
+    .card.income {
+      background: var(--bt-card-income-bg);
+    }
+    .card.expense {
+      background: var(--bt-card-expense-bg);
+    }
+    .card.balance {
+      background: var(--bt-card-balance-bg);
+    }
+    .card-label {
+      font-size: 0.85rem;
+      color: var(--bt-text-secondary);
+    }
+    .card-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--bt-text);
+    }
 
-    .chart-section { margin-bottom: 2rem; }
-    .chart-section h3 { margin: 0 0 1rem; }
+    .chart-section {
+      margin-bottom: 2rem;
+    }
+    .chart-section h3 {
+      margin: 0 0 1rem;
+    }
     .chart-container {
       max-width: 400px;
       margin: 0 auto;
     }
 
-    .category-table { margin-bottom: 1rem; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--bt-border); }
-    th { font-size: 0.85rem; color: var(--bt-text-secondary); font-weight: 600; }
-    .text-right { text-align: right; }
-    .clickable { cursor: pointer; }
-    .clickable:hover { background: var(--bt-row-hover); }
+    .category-table {
+      margin-bottom: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th,
+    td {
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--bt-border);
+    }
+    th {
+      font-size: 0.85rem;
+      color: var(--bt-text-secondary);
+      font-weight: 600;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .clickable {
+      cursor: pointer;
+    }
+    .clickable:hover {
+      background: var(--bt-row-hover);
+    }
     .color-dot {
       display: inline-block;
       width: 12px;
@@ -157,7 +209,12 @@ import type { CategoryTotal, MonthlyReport } from '../../../../shared/api-types'
       vertical-align: middle;
     }
 
-    .loading, .empty { color: var(--bt-text-muted); text-align: center; padding: 2rem; }
+    .loading,
+    .empty {
+      color: var(--bt-text-muted);
+      text-align: center;
+      padding: 2rem;
+    }
   `,
 })
 export default class OverviewComponent {
@@ -205,7 +262,10 @@ export default class OverviewComponent {
   prevMonth() {
     let m = this.currentMonth() - 1;
     let y = this.currentYear();
-    if (m < 1) { m = 12; y--; }
+    if (m < 1) {
+      m = 12;
+      y--;
+    }
     this.currentMonth.set(m);
     this.currentYear.set(y);
     this.load();
@@ -214,7 +274,10 @@ export default class OverviewComponent {
   nextMonth() {
     let m = this.currentMonth() + 1;
     let y = this.currentYear();
-    if (m > 12) { m = 1; y++; }
+    if (m > 12) {
+      m = 1;
+      y++;
+    }
     this.currentMonth.set(m);
     this.currentYear.set(y);
     this.load();

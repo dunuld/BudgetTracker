@@ -2,7 +2,8 @@ import { Component, computed, signal } from '@angular/core';
 import { ApiService } from '../../core/api.service.js';
 import { formatMonthYear as fmtMonthYear } from '../../core/format.js';
 import ChartComponent from '../../shared/chart.component.js';
-import type { Category, TrendMonth, TrendReport } from '../../../../shared/api-types';
+import type { TooltipItem } from 'chart.js';
+import type { TrendMonth, TrendReport } from '../../../../shared/api-types';
 
 @Component({
   selector: 'app-trend',
@@ -29,7 +30,7 @@ import type { Category, TrendMonth, TrendReport } from '../../../../shared/api-t
         <div class="chart-section">
           <app-chart
             [type]="'bar'"
-            [labels]="report()!.months.map(m => formatMonthLabel(m.month))"
+            [labels]="report()!.months.map((m) => formatMonthLabel(m.month))"
             [datasets]="chartDatasets()"
             [options]="chartOptions()"
           />
@@ -88,15 +89,39 @@ import type { Category, TrendMonth, TrendReport } from '../../../../shared/api-t
       cursor: pointer;
       font-size: 0.9rem;
     }
-    .btn-primary:disabled { opacity: 0.5; cursor: default; }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
 
-    .chart-section { margin-bottom: 2rem; }
+    .chart-section {
+      margin-bottom: 2rem;
+    }
 
-    .trend-table { margin-bottom: 1rem; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--bt-border); }
-    th { font-size: 0.85rem; color: var(--bt-text-secondary); font-weight: 600; white-space: nowrap; }
-    .text-right { text-align: right; }
+    .trend-table {
+      margin-bottom: 1rem;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+    th,
+    td {
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--bt-border);
+    }
+    th {
+      font-size: 0.85rem;
+      color: var(--bt-text-secondary);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .text-right {
+      text-align: right;
+    }
     .color-dot {
       display: inline-block;
       width: 12px;
@@ -106,7 +131,12 @@ import type { Category, TrendMonth, TrendReport } from '../../../../shared/api-t
       vertical-align: middle;
     }
 
-    .loading, .empty { color: var(--bt-text-muted); text-align: center; padding: 2rem; }
+    .loading,
+    .empty {
+      color: var(--bt-text-muted);
+      text-align: center;
+      padding: 2rem;
+    }
   `,
 })
 export default class TrendComponent {
@@ -141,12 +171,12 @@ export default class TrendComponent {
   readonly chartOptions = computed(() => ({
     scales: {
       x: { stacked: true },
-      y: { stacked: true, ticks: { callback: (value: number) => this.formatEuroTick(value) } }
+      y: { stacked: true, ticks: { callback: (value: number) => this.formatEuroTick(value) } },
     },
     plugins: {
       legend: { display: true, position: 'bottom' as const },
-      tooltip: { callbacks: { label: (ctx: any) => this.formatTooltip(ctx) } }
-    }
+      tooltip: { callbacks: { label: (ctx: TooltipItem<'bar'>) => this.formatTooltip(ctx) } },
+    },
   }));
 
   constructor() {
@@ -190,7 +220,9 @@ export default class TrendComponent {
   }
 
   formatEuro(cents: number): string {
-    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
+    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(
+      cents / 100,
+    );
   }
 
   formatEuroTick(value: number): string {
@@ -200,8 +232,8 @@ export default class TrendComponent {
     return `${(value / 100).toFixed(0)} €`;
   }
 
-  formatTooltip(context: any): string {
-    const value = context.parsed.y;
+  formatTooltip(context: TooltipItem<'bar'>): string {
+    const value = context.parsed.y ?? 0;
     return `${context.dataset.label}: ${this.formatEuro(value)}`;
   }
 

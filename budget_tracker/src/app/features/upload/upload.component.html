@@ -4,37 +4,59 @@
   <label class="drop-zone">
     <span class="icon">📄</span>
     <span>PDF-Kontoauszug auswählen oder hierher ziehen</span>
-    <input type="file" accept=".pdf,application/pdf" (change)="onFileSelected($event)" hidden>
+    <input type="file" accept=".pdf,application/pdf" (change)="onFileSelected($event)" hidden />
   </label>
-  <div *ngIf="uploading()" class="loading">Wird hochgeladen …</div>
+  @if (uploading()) {
+    <div class="loading">Wird hochgeladen …</div>
+  }
 </div>
 
-<div *ngIf="fileName() && !uploading()" class="file-name">Datei: {{ fileName() }}</div>
+@if (fileName() && !uploading()) {
+  <div class="file-name">Datei: {{ fileName() }}</div>
+}
 
-<div *ngIf="error()" class="error">{{ error() }}</div>
+@if (error()) {
+  <div class="error">{{ error() }}</div>
+}
 
-<div *ngIf="result()" class="result">
-  <h3>Import erfolgreich</h3>
-  <dl>
-    <dt>Auszug</dt>
-    <dd>{{ result()!.statement.iban }} — {{ result()!.statement.month }}/{{ result()!.statement.year }}</dd>
-    <dt>Zeitraum</dt>
-    <dd>{{ result()!.periodFrom }} bis {{ result()!.periodTo }}</dd>
-    <dt>Buchungen</dt>
-    <dd>{{ result()!.transactionCount }}</dd>
-    <dt>Alter Saldo</dt>
-    <dd>{{ formatEuro(result()!.statement.openingCents) }}</dd>
-    <dt>Neuer Saldo</dt>
-    <dd>{{ formatEuro(result()!.statement.closingCents) }}</dd>
-    <dt>Summe Buchungen</dt>
-    <dd>{{ formatEuro(result()!.sumCents) }}</dd>
-    <dt *ngIf="result()!.uncategorizedCount">Unkategorisiert</dt>
-    <dd *ngIf="result()!.uncategorizedCount">{{ result()!.uncategorizedCount }}</dd>
-  </dl>
-  <div *ngIf="!result()!.balanceOk" class="warning">
-    ⚠️ Die Summe der Buchungen entspricht nicht der Saldo-Differenz. Bitte den Auszug prüfen.
+@if (result()) {
+  <div class="result">
+    <h3>Import erfolgreich</h3>
+    <dl>
+      <dt>Auszug</dt>
+      <dd>
+        {{ result()!.statement.iban }} — {{ result()!.statement.month }}/{{
+          result()!.statement.year
+        }}
+      </dd>
+      <dt>Zeitraum</dt>
+      <dd>{{ result()!.periodFrom }} bis {{ result()!.periodTo }}</dd>
+      <dt>Buchungen</dt>
+      <dd>{{ result()!.transactionCount }}</dd>
+      <dt>Alter Saldo</dt>
+      <dd>{{ formatEuro(result()!.statement.openingCents) }}</dd>
+      <dt>Neuer Saldo</dt>
+      <dd>{{ formatEuro(result()!.statement.closingCents) }}</dd>
+      <dt>Summe Buchungen</dt>
+      <dd>{{ formatEuro(result()!.sumCents) }}</dd>
+      @if (result()!.uncategorizedCount) {
+        <dt>Unkategorisiert</dt>
+      }
+      @if (result()!.uncategorizedCount) {
+        <dd>{{ result()!.uncategorizedCount }}</dd>
+      }
+    </dl>
+    @if (!result()!.balanceOk) {
+      <div class="warning">
+        ⚠️ Die Summe der Buchungen entspricht nicht der Saldo-Differenz. Bitte den Auszug prüfen.
+      </div>
+    }
+    @if (result()!.warnings.length) {
+      <div class="warnings">
+        @for (w of result()!.warnings; track w) {
+          <div class="warning">⚠️ {{ w }}</div>
+        }
+      </div>
+    }
   </div>
-  <div *ngIf="result()!.warnings.length" class="warnings">
-    <div *ngFor="let w of result()!.warnings" class="warning">⚠️ {{ w }}</div>
-  </div>
-</div>
+}

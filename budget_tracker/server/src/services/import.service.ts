@@ -5,7 +5,11 @@ import type { ImportResult, Statement } from '../../../shared/api-types.js';
 import type { CategoryAssignment } from '../categorization/categorizer.js';
 import { transaction, type Database } from '../db/database.js';
 import { HttpError, badRequest, notFound } from '../http-error.js';
-import { StatementParseError, type BankParser, type ParsedTransaction } from '../parsing/bank-parser.js';
+import {
+  StatementParseError,
+  type BankParser,
+  type ParsedTransaction,
+} from '../parsing/bank-parser.js';
 import { IngParser } from '../parsing/ing-parser.js';
 import { extractLines } from '../parsing/pdf-text.js';
 
@@ -51,7 +55,8 @@ function toStatement(row: Record<string, unknown>): Statement {
 export function normalizeFileName(name: string | undefined): string {
   let result = basename(name?.trim() || 'kontoauszug.pdf');
   const decoded = Buffer.from(result, 'latin1').toString('utf8');
-  if (!decoded.includes('\uFFFD') && /[^\x00-\x7F]/.test(result)) result = decoded;
+  if (!decoded.includes('\uFFFD') && [...result].some((c) => c.charCodeAt(0) > 0x7f))
+    result = decoded;
   return result.slice(0, 200);
 }
 
@@ -69,7 +74,11 @@ export class ImportService {
     this.categorize = options.categorize ?? this.defaultCategorize();
   }
 
-  async importPdf(file: Uint8Array, originalName: string | undefined, options: ImportOptions = {}): Promise<ImportResult> {
+  async importPdf(
+    file: Uint8Array,
+    originalName: string | undefined,
+    options: ImportOptions = {},
+  ): Promise<ImportResult> {
     if (!isPdf(file)) throw badRequest('Die Datei ist kein PDF-Dokument.', 'INVALID_FILE');
 
     const fileHash = createHash('sha256').update(file).digest('hex');
@@ -81,7 +90,10 @@ export class ImportService {
     } catch (error) {
       const name = (error as Error | undefined)?.name;
       if (name === 'PasswordException') {
-        throw badRequest('Das PDF ist passwortgeschützt und kann nicht gelesen werden.', 'INVALID_FILE');
+        throw badRequest(
+          'Das PDF ist passwortgeschützt und kann nicht gelesen werden.',
+          'INVALID_FILE',
+        );
       }
       throw badRequest('Das PDF konnte nicht gelesen werden.', 'INVALID_FILE');
     }
@@ -99,13 +111,18 @@ export class ImportService {
       parsed = parser.parse(lines);
     } catch (error) {
       if (error instanceof StatementParseError) {
-        throw badRequest(`Kontoauszug konnte nicht ausgewertet werden: ${error.message}`, 'PARSE_ERROR');
+        throw badRequest(
+          `Kontoauszug konnte nicht ausgewertet werden: ${error.message}`,
+          'PARSE_ERROR',
+        );
       }
       throw error;
     }
 
     const duplicateRows = this.db
-      .prepare(`${STATEMENT_SELECT} WHERE s.file_hash = ? OR (s.iban = ? AND s.year = ? AND s.month = ?)`)
+      .prepare(
+        `${STATEMENT_SELECT} WHERE s.file_hash = ? OR (s.iban = ? AND s.year = ? AND s.month = ?)`,
+      )
       .all(fileHash, parsed.iban, parsed.year, parsed.month);
     const duplicates = duplicateRows.map(toStatement);
     if (duplicates.length && !options.replace) {
@@ -128,7 +145,8 @@ export class ImportService {
           `neuem und altem Saldo (${formatCents(expectedCents)}). Bitte den Auszug prüfen.`,
       );
     }
-    if (parsed.transactions.length === 0) warnings.push('Im Kontoauszug wurden keine Buchungen gefunden.');
+    if (parsed.transactions.length === 0)
+      warnings.push('Im Kontoauszug wurden keine Buchungen gefunden.');
 
     const assignments = parsed.transactions.map((tx) => this.categorize(tx));
     const uncategorizedCount = assignments.filter((a) => a.source === 'default').length;

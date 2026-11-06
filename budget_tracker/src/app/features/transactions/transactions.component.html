@@ -9,13 +9,12 @@
 
   <select
     class="category-filter"
-    [value]="categoryId() ?? ''"
     (change)="onFilterCategoryChange($event)"
     aria-label="Kategorie filtern"
   >
-    <option value="">Alle Kategorien</option>
-    @for (c of categories(); track c) {
-      <option [value]="c.id">{{ c.name }}</option>
+    <option value="" [selected]="categoryId() === null">Alle Kategorien</option>
+    @for (c of categories(); track c.id) {
+      <option [value]="c.id" [selected]="c.id === categoryId()">{{ c.name }}</option>
     }
   </select>
 
@@ -59,13 +58,18 @@
               {{ formatEuro(tx.amountCents) }}
             </td>
             <td class="category">
-              <select
-                [value]="tx.categoryId ?? ''"
-                (change)="onCategoryChange(tx, $event)"
-                aria-label="Kategorie"
-              >
-                @for (c of categories(); track c) {
-                  <option [value]="c.id" [style.color]="c.color">{{ c.name }}</option>
+              <select (change)="onCategoryChange(tx, $event)" aria-label="Kategorie">
+                <option value="" disabled [selected]="tx.categoryId === null">
+                  — unkategorisiert —
+                </option>
+                @for (c of categories(); track c.id) {
+                  <option
+                    [value]="c.id"
+                    [style.color]="c.color"
+                    [selected]="c.id === tx.categoryId"
+                  >
+                    {{ c.name }}
+                  </option>
                 }
               </select>
             </td>

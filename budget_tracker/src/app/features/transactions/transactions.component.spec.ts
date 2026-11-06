@@ -218,6 +218,76 @@ describe('TransactionsComponent', () => {
     expect(component.formatEuro(-4599)).toContain('-45,99');
   });
 
+  describe('Kategorie-Auswahlfelder', () => {
+    async function render(txs: Transaction[]) {
+      const fixture = TestBed.createComponent(TransactionsComponent);
+      fixture.detectChanges();
+      httpMock.expectOne((req) => req.url === 'api/transactions').flush(txs);
+      httpMock.expectOne('api/categories').flush(createMockCategories());
+      await vi.waitFor(() => {
+        fixture.detectChanges();
+        expect(fixture.componentInstance.loading()).toBe(false);
+      });
+      fixture.detectChanges();
+      return fixture;
+    }
+
+    function rowSelects(fixture: { nativeElement: HTMLElement }) {
+      return Array.from(fixture.nativeElement.querySelectorAll<HTMLSelectElement>('tbody select'));
+    }
+
+    it('zeigt pro Zeile die Kategorie der Transaktion an', async () => {
+      const txs = [
+        ...createMockTransactions(),
+        { ...createMockTransactions()[0]!, id: 3, categoryId: 4 },
+      ];
+      const fixture = await render(txs);
+
+      const selects = rowSelects(fixture);
+      expect(selects.length).toBe(3);
+      selects.forEach((select, i) => {
+        expect(select.value).toBe(String(txs[i]!.categoryId));
+        expect(select.selectedOptions[0]!.textContent?.trim()).toBe(
+          createMockCategories().find((c) => c.id === txs[i]!.categoryId)!.name,
+        );
+      });
+    });
+
+    it('zeigt "unkategorisiert" für Transaktionen ohne Kategorie', async () => {
+      const fixture = await render([{ ...createMockTransactions()[0]!, categoryId: null }]);
+
+      const [select] = rowSelects(fixture);
+      expect(select!.value).toBe('');
+      expect(select!.selectedOptions[0]!.textContent).toContain('unkategorisiert');
+    });
+
+    it('ignoriert die Auswahl der leeren Option', async () => {
+      const fixture = await render(createMockTransactions());
+      const select = document.createElement('select');
+      select.append(new Option('', ''));
+      select.value = '';
+      fixture.componentInstance.onCategoryChange(createMockTransactions()[0]!, {
+        target: select,
+      } as unknown as Event);
+      httpMock.expectNone('api/transactions/1');
+    });
+
+    it('zeigt die gewählte Filter-Kategorie im Filterfeld an', async () => {
+      const fixture = await render(createMockTransactions());
+      const filter = (fixture.nativeElement as HTMLElement).querySelector<HTMLSelectElement>(
+        '.filters select',
+      )!;
+      expect(filter.value).toBe('');
+
+      fixture.componentInstance.categoryId.set(3);
+      fixture.detectChanges();
+      expect(filter.value).toBe('3');
+      httpMock.expectOne((req) => req.url === 'api/transactions').flush([]);
+      httpMock.expectOne('api/categories').flush(createMockCategories());
+      await fixture.whenStable();
+    });
+  });
+
   describe('Kategorie ändern', () => {
     async function setup() {
       const fixture = TestBed.createComponent(TransactionsComponent);

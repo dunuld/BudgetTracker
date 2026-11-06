@@ -63,7 +63,9 @@ export default class TransactionsComponent {
   }
 
   onCategoryChange(tx: Transaction, event: Event) {
-    const newCategoryId = Number((event.target as HTMLSelectElement).value);
+    const value = (event.target as HTMLSelectElement).value;
+    if (!value) return;
+    const newCategoryId = Number(value);
     this.changeCategory(tx, newCategoryId);
   }
 

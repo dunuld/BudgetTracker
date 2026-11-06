@@ -217,4 +217,53 @@ describe('TransactionsComponent', () => {
     expect(component.formatEuro(100000)).toContain('1.000,00');
     expect(component.formatEuro(-4599)).toContain('-45,99');
   });
+
+  describe('Kategorie ändern', () => {
+    async function setup() {
+      const fixture = TestBed.createComponent(TransactionsComponent);
+      fixture.detectChanges();
+      httpMock.expectOne((req) => req.url === 'api/transactions').flush(createMockTransactions());
+      httpMock.expectOne('api/categories').flush(createMockCategories());
+      await fixture.whenStable();
+      fixture.detectChanges();
+      return { fixture, component: fixture.componentInstance };
+    }
+
+    it('speichert die neue Kategorie aus dem Auswahlfeld und lädt neu', async () => {
+      const { component } = await setup();
+      const select = document.createElement('select');
+      select.append(new Option('Miete', '2'));
+      select.value = '2';
+
+      component.onCategoryChange(createMockTransactions()[0]!, {
+        target: select,
+      } as unknown as Event);
+      const patch = await vi.waitFor(() => httpMock.expectOne('api/transactions/1'));
+      expect(patch.request.method).toBe('PATCH');
+      expect(patch.request.body).toEqual({ categoryId: 2 });
+      patch.flush({
+        transaction: { ...createMockTransactions()[0]!, categoryId: 2, categorySource: 'manual' },
+      });
+
+      const updated = createMockTransactions().map((t) =>
+        t.id === 1 ? { ...t, categoryId: 2 } : t,
+      );
+      (await vi.waitFor(() => httpMock.expectOne((req) => req.url === 'api/transactions'))).flush(
+        updated,
+      );
+      httpMock.expectOne('api/categories').flush(createMockCategories());
+      await vi.waitFor(() => expect(component.transactions()[0]!.categoryId).toBe(2));
+      expect(component.error()).toBeNull();
+    });
+
+    it('zeigt die Server-Meldung, wenn das Speichern fehlschlägt', async () => {
+      const { component } = await setup();
+      const done = component.changeCategory(createMockTransactions()[0]!, 99);
+      httpMock
+        .expectOne('api/transactions/1')
+        .flush({ error: 'Kategorie nicht gefunden' }, { status: 404, statusText: 'Not Found' });
+      await done;
+      expect(component.error()).toBe('Kategorie nicht gefunden');
+    });
+  });
 });

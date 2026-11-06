@@ -184,4 +184,88 @@ describe('TrendComponent', () => {
     expect(datasets[0].label).toBe('Lebensmittel');
     expect(datasets[0].data.length).toBe(3);
   });
+
+  describe('Zeitraum und Diagramm', () => {
+    afterEach(() => vi.useRealTimers());
+
+    const trendRequest = () => httpMock.expectOne((req) => req.url === 'api/reports/trend');
+
+    it.each([
+      // 31. Juli: setMonth(-5) wäre auf den 3. März übergelaufen
+      ['31.07.2026', new Date(2026, 6, 31), '2026-02', '2026-07'],
+      ['15.03.2026', new Date(2026, 2, 15), '2025-10', '2026-03'],
+      ['01.01.2026', new Date(2026, 0, 1), '2025-08', '2026-01'],
+    ])('wählt am %s die letzten sechs Monate', (_label, now, from, to) => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(now);
+      const fixture = TestBed.createComponent(TrendComponent);
+      // Request zuerst beantworten, damit ein Fehlschlag keine offenen Requests hinterlässt
+      const req = trendRequest();
+      req.flush(createMockTrendReport());
+      expect(fixture.componentInstance.fromMonth()).toBe(from);
+      expect(fixture.componentInstance.toMonth()).toBe(to);
+      expect(req.request.params.toString()).toBe(`from=${from}&to=${to}`);
+    });
+
+    it('lädt den gewählten Zeitraum über den Anzeigen-Button', async () => {
+      const fixture = TestBed.createComponent(TrendComponent);
+      fixture.detectChanges();
+      trendRequest().flush(createMockTrendReport());
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+
+      const [fromInput, toInput] = Array.from(
+        el.querySelectorAll<HTMLInputElement>('input[type="month"]'),
+      );
+      fromInput!.value = '2024-01';
+      fromInput!.dispatchEvent(new Event('change'));
+      toInput!.value = '2024-03';
+      toInput!.dispatchEvent(new Event('change'));
+      el.querySelector<HTMLButtonElement>('.btn-primary')!.click();
+
+      const req = trendRequest();
+      expect(req.request.params.toString()).toBe('from=2024-01&to=2024-03');
+      req.flush(createMockTrendReport());
+      expect(fixture.componentInstance.loading()).toBe(false);
+    });
+
+    it('lädt nicht bei leerem Zeitraum', () => {
+      const fixture = TestBed.createComponent(TrendComponent);
+      trendRequest().flush(createMockTrendReport());
+      fixture.componentInstance.fromMonth.set('');
+      fixture.componentInstance.load();
+      httpMock.expectNone((req) => req.url === 'api/reports/trend');
+    });
+
+    it('zeigt nur Ausgabekategorien mit Beträgen als positive Werte', () => {
+      const fixture = TestBed.createComponent(TrendComponent);
+      const report = createMockTrendReport();
+      report.categories.push({ id: 3, name: 'Gehalt', color: '#03a9f4', kind: 'income' });
+      report.months[0]!.totals.push({ categoryId: 3, totalCents: 300000 });
+      trendRequest().flush(report);
+
+      const datasets = fixture.componentInstance.chartDatasets();
+      expect(datasets.map((d) => d.label)).toEqual(['Lebensmittel', 'Miete']);
+      expect(datasets[0]!.data).toEqual([50000, 45000, 55000]);
+    });
+
+    it('formatiert Achsen-Ticks und Tooltips über die Diagramm-Optionen', () => {
+      const fixture = TestBed.createComponent(TrendComponent);
+      trendRequest().flush(createMockTrendReport());
+      const options = fixture.componentInstance.chartOptions();
+
+      const tick = options.scales.y.ticks.callback;
+      expect(tick(0)).toBe('0 €');
+      expect(tick(4500)).toBe('45 €');
+      expect(tick(250000)).toBe('2.5k €');
+
+      const label = options.plugins.tooltip.callbacks.label;
+      const text = label({ parsed: { y: 12345 }, dataset: { label: 'Miete' } } as never);
+      expect(text).toMatch(/^Miete: 123,45\s€$/);
+      expect(label({ parsed: { y: null }, dataset: { label: 'X' } } as never)).toMatch(
+        /^X: 0,00\s€$/,
+      );
+    });
+  });
 });

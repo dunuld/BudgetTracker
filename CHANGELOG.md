@@ -3,22 +3,29 @@
 ## Unreleased
 
 ### Behoben
+
 - **Regex-Regeln**: Muster wurden vor dem Abgleich in Großbuchstaben gewandelt (`\b` → `\B`), daher griffen u. a. die Standardregeln für ESSO, ARAL, NETTO, DM und LOHN nie
 - **Regeln neu anwenden**: Buchungen ohne Treffer wurden als „Regel“ statt „Standard“ markiert; gemeldet werden jetzt nur tatsächlich geänderte Buchungen
 - **Transaktionsfilter nach Monat**: Monat wurde als Text verkettet (`"3" + 1 = "31"`), wodurch z. B. der März auch April–Dezember enthielt
 - **Verlauf**: Ungültiger Monat (z. B. `2025-13`) führte zu einer Endlosschleife im Server; Zeitraum ist jetzt auf 120 Monate begrenzt
 - **Kategorien/Regeln**: Ungültige Eingaben, doppelte Namen und das Löschen der Standardkategorie liefern verständliche 400/409-Fehler statt 500
 - **Suche**: `%` und `_` werden wörtlich gesucht
+- **Verlauf**: Der Standardzeitraum begann am 29.–31. eines Monats einen Monat zu spät (Datumsüberlauf bei `setMonth`)
+- **Fehlermeldungen im Frontend**: Beim Ersetzen eines Auszugs und beim Ändern einer Kategorie wurde statt der Server-Meldung nur „Ersetzen fehlgeschlagen“ bzw. „Fehler“ angezeigt
 
 ### Technik
+
 - Neue Tests für Kategorien-, Regel-, Transaktions- und Report-API sowie den Categorizer (Server-Coverage 65 % → 95 % Zeilen)
 - Coverage-Schwellen für Server und Angular; CI bricht bei Unterschreitung ab
 - ESLint (typescript-eslint, angular-eslint) und Prettier-Prüfung; Templates auf Built-in Control Flow (`@if`/`@for`) migriert
 - Neuer Workflow „Code Quality“: Formatierung, Lint, Typprüfung, Dependency-Audit
+- Frontend-Tests für Einstellungen, Upload-Duplikate, Theme-Service, API-Service und Verlauf (Funktions-Coverage 50 % → 86 %); Coverage-Schwellen entsprechend angehoben
+- Services werden in Komponenten per `inject()` statt `new` bezogen
 
 ## 1.0.0 (2026-11-05)
 
 ### Hinzugefügt
+
 - **PDF-Import**: ING-Girokonto-Kontoauszüge als PDF hochladen, Transaktionen automatisch parsen
 - **Kategorisierung**: Regelbasierte Zuordnung mit vordefinierten Kategorien (Lebensmittel, Streaming, Versicherungen, etc.)
 - **Monatsübersicht**: Einnahmen, Ausgaben, Saldo mit Donut-Diagramm nach Kategorie
@@ -31,6 +38,7 @@
 - **Dark Mode**: Umschaltbarer dunkler Modus mit drei Stufen (Hell, Dunkel, System-Einstellung); Wahl wird im localStorage gespeichert; Diagramme passen sich automatisch an
 
 ### Technik
+
 - Angular 22 Frontend mit Signal-basierten Komponenten
 - Node.js/Express Backend (TypeScript)
 - SQLite-Datenbank über `node:sqlite` (Node 24)

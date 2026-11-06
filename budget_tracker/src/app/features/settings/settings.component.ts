@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/api.service.js';
 import { formatDate as fmtDate } from '../../core/format.js';
@@ -335,7 +335,7 @@ import type { CategoryKind, RuleField, RuleMatchType } from '../../../../shared/
   `,
 })
 export default class SettingsComponent {
-  private readonly api = new ApiService();
+  private readonly api = inject(ApiService);
 
   readonly activeTab = signal<'categories' | 'rules' | 'statements'>('categories');
 

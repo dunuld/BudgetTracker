@@ -1,6 +1,7 @@
 import { Component, signal, computed, effect, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
+import { apiErrorMessage } from '../../core/api-error';
 import { ApiService } from '../../core/api.service';
 import { formatEuro, formatMonthYear } from '../../core/format';
 import type { Category, Transaction, TransactionQuery } from '../../../../shared/api-types';
@@ -50,7 +51,7 @@ export default class TransactionsComponent {
       this.transactions.set(txs);
       this.categories.set(cats);
     } catch (err: unknown) {
-      this.error.set(err instanceof Error ? err.message : 'Fehler beim Laden');
+      this.error.set(apiErrorMessage(err, 'Fehler beim Laden'));
     } finally {
       this.loading.set(false);
     }
@@ -71,7 +72,7 @@ export default class TransactionsComponent {
       await firstValueFrom(this.api.patchTransaction(tx.id, { categoryId: newCategoryId }));
       await this.load();
     } catch (err: unknown) {
-      this.error.set(err instanceof Error ? err.message : 'Fehler');
+      this.error.set(apiErrorMessage(err, 'Kategorie konnte nicht geändert werden'));
     }
   }
 

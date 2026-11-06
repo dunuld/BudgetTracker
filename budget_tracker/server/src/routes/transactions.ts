@@ -1,15 +1,14 @@
 import { Router } from 'express';
 import type { DatabaseSync } from 'node:sqlite';
-import type { ParsedTransaction } from '../parsing/bank-parser.js';
-import { Categorizer } from '../categorization/categorizer.js';
-import { badRequest, notFound } from '../http-error.js';
 import type {
-  Rule,
   Transaction,
   TransactionPatch,
   TransactionPatchResult,
-  TransactionQuery,
 } from '../../../shared/api-types.js';
+import { Categorizer } from '../categorization/categorizer.js';
+import { badRequest, notFound, parseId } from '../http-error.js';
+import { monthStart, nextMonthStart } from '../month.js';
+import { toRule } from './rules.js';
 
 function toTransaction(row: Record<string, unknown>): Transaction {
   return {
@@ -27,27 +26,41 @@ function toTransaction(row: Record<string, unknown>): Transaction {
   };
 }
 
+/** Optionalen Query-Parameter als Ganzzahl in [min, max] lesen. */
+function intParam(value: unknown, name: string, min: number, max: number): number | undefined {
+  if (value === undefined || value === '') return undefined;
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < min || n > max) throw badRequest(`Ungültiger Parameter ${name}`);
+  return n;
+}
+
 export function transactionsRouter(db: DatabaseSync): Router {
   const router = Router();
   const categorizer = new Categorizer(db);
 
   router.get('/', (req, res) => {
-    const query = req.query as unknown as TransactionQuery;
+    // Query-Werte kommen als Strings – vor dem Rechnen in Zahlen wandeln
+    // (sonst wird aus "3" + 1 der String "31").
+    const year = intParam(req.query['year'], 'year', 1990, 2200);
+    const month = intParam(req.query['month'], 'month', 1, 12);
+    const categoryId = intParam(req.query['categoryId'], 'categoryId', 1, Number.MAX_SAFE_INTEGER);
+    const q = typeof req.query['q'] === 'string' ? req.query['q'].trim() : '';
+
     const conditions: string[] = [];
     const params: (string | number)[] = [];
 
-    if (query.year && query.month) {
-      const mm = String(query.month).padStart(2, '0');
+    if (year !== undefined && month !== undefined) {
       conditions.push('t.booking_date >= ? AND t.booking_date < ?');
-      params.push(`${query.year}-${mm}-01`, nextMonth(query.year, query.month));
+      params.push(monthStart(year, month), nextMonthStart(year, month));
     }
-    if (query.categoryId) {
+    if (categoryId !== undefined) {
       conditions.push('t.category_id = ?');
-      params.push(query.categoryId);
+      params.push(categoryId);
     }
-    if (query.q) {
-      conditions.push('(t.counterparty LIKE ? OR t.purpose LIKE ?)');
-      const like = `%${query.q}%`;
+    if (q) {
+      // % und _ wörtlich suchen
+      conditions.push("(t.counterparty LIKE ? ESCAPE '\\' OR t.purpose LIKE ? ESCAPE '\\')");
+      const like = `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
       params.push(like, like);
     }
 
@@ -60,62 +73,34 @@ export function transactionsRouter(db: DatabaseSync): Router {
 
   router.patch('/:id', (req, res) => {
     const id = parseId(req.params['id']);
-    const input = req.body as TransactionPatch;
-
-    if (!input.categoryId) throw badRequest('categoryId ist erforderlich');
+    const input = (req.body ?? {}) as Partial<TransactionPatch>;
+    const categoryId = Number(input.categoryId);
+    if (!Number.isSafeInteger(categoryId) || categoryId <= 0)
+      throw badRequest('categoryId ist erforderlich');
 
     const txRow = db.prepare('SELECT * FROM transactions WHERE id = ?').get(id);
     if (!txRow) throw notFound('Transaktion nicht gefunden');
-
-    const cat = db.prepare('SELECT id FROM categories WHERE id = ?').get(input.categoryId);
-    if (!cat) throw notFound('Kategorie nicht gefunden');
+    if (!db.prepare('SELECT id FROM categories WHERE id = ?').get(categoryId)) {
+      throw notFound('Kategorie nicht gefunden');
+    }
+    const tx = toTransaction(txRow);
+    if (input.createRule && !tx.counterparty.trim()) {
+      throw badRequest('Für Buchungen ohne Empfänger kann keine Regel angelegt werden');
+    }
 
     db.prepare(
       "UPDATE transactions SET category_id = ?, category_source = 'manual', rule_id = NULL WHERE id = ?",
-    ).run(input.categoryId, id);
+    ).run(categoryId, id);
 
     const result: TransactionPatchResult = {
       transaction: toTransaction(db.prepare('SELECT * FROM transactions WHERE id = ?').get(id)!),
     };
-
     if (input.createRule) {
-      const tx = toTransaction(txRow);
-      const parsed: ParsedTransaction = {
-        bookingDate: tx.bookingDate,
-        valueDate: tx.valueDate,
-        type: tx.type,
-        counterparty: tx.counterparty,
-        purpose: tx.purpose,
-        amountCents: tx.amountCents,
-      };
-      const ruleId = categorizer.createRuleFromTransaction(parsed, input.categoryId);
-      const ruleRow = db.prepare('SELECT * FROM rules WHERE id = ?').get(ruleId);
-      if (ruleRow) {
-        result.rule = {
-          id: Number(ruleRow['id']),
-          categoryId: Number(ruleRow['category_id']),
-          field: String(ruleRow['field']) as Rule['field'],
-          matchType: String(ruleRow['match_type']) as Rule['matchType'],
-          pattern: String(ruleRow['pattern']),
-          priority: Number(ruleRow['priority']),
-        };
-      }
+      const ruleId = categorizer.createRuleFromTransaction(tx, categoryId);
+      result.rule = toRule(db.prepare('SELECT * FROM rules WHERE id = ?').get(ruleId)!);
     }
-
     res.json(result);
   });
 
   return router;
-}
-
-function parseId(value: unknown): number {
-  const id = Number(value);
-  if (!Number.isSafeInteger(id) || id <= 0) throw badRequest('Ungültige ID');
-  return id;
-}
-
-function nextMonth(year: number, month: number): string {
-  const nextMonth = month === 12 ? 1 : month + 1;
-  const nextYear = month === 12 ? year + 1 : year;
-  return `${nextYear}-${String(nextMonth).padStart(2, '0')}`;
 }

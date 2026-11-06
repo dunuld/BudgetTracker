@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 (2026-11-06)
 
 ### Geändert
 - **Home-Assistant-Einbettung**: Im Modus „System“ übernimmt das Panel jetzt Farben, Schrift und Hell/Dunkel des aktiven HA-Themes (auch bei Theme-Wechsel zur Laufzeit); manuelle Auswahl Hell/Dunkel hat weiterhin Vorrang
